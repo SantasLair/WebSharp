@@ -232,6 +232,49 @@ Each phase builds on the previous one and has a concrete, testable deliverable t
 - Optionally support Microsoft 365 Agents Toolkit for building agents that use calendar, email, or document context.
 - Allow contributors to scaffold and run Web# projects as easily as an npm project (npm run dev).
 
+## Node.js Runtime Support
+
+While Web# is primarily designed for browser environments, the language can also target Node.js for:
+
+**Server-Side Rendering (SSR):**
+- Pre-render Web# components on the server using jsdom or similar DOM simulation
+- Share domain models between client and server without modification
+- Enable isomorphic/universal Web# applications
+
+**Build Tools & CLI Applications:**
+- Web# scripts for build automation, scaffolding, and developer tooling
+- Command-line utilities written in familiar C# syntax
+- Integration with existing Node.js build pipelines (webpack, vite, etc.)
+
+**Development Environment:**
+- Hot reload and development servers written in Web#
+- Custom bundlers, linters, and code transformation tools
+- Testing frameworks and development utilities
+
+**Node.js API Bindings:**
+```csharp
+// File system operations
+var content = await File.ReadAllTextAsync("./config.json");
+var config = JsonSerializer.Deserialize<Config>(content);
+
+// HTTP server
+var server = new HttpServer(3000);
+server.OnRequest += async (req, res) => {
+    var html = await RenderComponent(new MyApp());
+    res.Send(html);
+};
+
+// Process and environment
+var nodeVersion = Process.Version;
+var isDev = Environment.GetVariable("NODE_ENV") == "development";
+```
+
+**Deployment Targets:**
+- **Browser**: Traditional client-side Web# applications
+- **Node.js**: Server-side rendering, build tools, CLI applications
+- **Hybrid**: Applications that share code between browser and server
+- **WebAssembly**: Performance-critical components compiled to WASM
+
 ## Development Approach
 
-Start by scaffolding the grammar and compiler pipeline. Then prototype the VM and interop layer. Prioritize simplicity, modularity, and contributor joy.
+Start by scaffolding the grammar and compiler pipeline. Then prototype the VM and interop layer. Prioritize simplicity, modularity, and contributor joy. Design the transpiler to emit different JavaScript targets based on the runtime environment (browser vs Node.js) while maintaining a unified Web# codebase.
