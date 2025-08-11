@@ -122,7 +122,17 @@ Thumbs.db
 
 # WebSharp specific
 *.ws.compiled
+*.ws.js
+*.ws.d.ts
+*.ws.map
 *.websharp.cache
+websharp-output/
+.websharp/
+
+# WebSharp Node.js integration
+node_modules/.websharp/
+*.websharp.node
+websharp-bindings/
 
 # Package manager locks (keep package-lock.json but ignore others)
 yarn.lock
