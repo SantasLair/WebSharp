@@ -120,6 +120,43 @@ Thumbs.db
 *.swo
 *~
 
+# WebSharp specific
+*.ws.compiled
+*.websharp.cache
+
+# Package manager locks (keep package-lock.json but ignore others)
+yarn.lock
+pnpm-lock.yaml
+
+# Editor backup files
+*~
+*.bak
+*.backup
+*.orig
+
+# Runtime generated files
+*.pid
+*.seed
+*.pid.lock
+
+# Debug files
+*.debug
+*.trace
+
+# Windows specific
+desktop.ini
+Thumbs.db:encryptable
+
+# macOS specific
+.AppleDouble
+.LSOverride
+Icon?
+
+# Linux specific
+.fuse_hidden*
+.directory
+.Trash-*
+
 # Testing
 .jest/
 test-results/
