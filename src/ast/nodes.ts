@@ -94,6 +94,86 @@ export class LiteralNode extends ExpressionNode {
   }
 }
 
+export class BinaryExpressionNode extends ExpressionNode {
+  constructor(
+    public readonly left: ExpressionNode,
+    public readonly operator: string,
+    public readonly right: ExpressionNode,
+    location?: SourceLocation
+  ) {
+    super('BinaryExpression', location);
+  }
+
+  toJSON(): Record<string, any> {
+    return {
+      type: this.type,
+      left: this.left.toJSON(),
+      operator: this.operator,
+      right: this.right.toJSON(),
+      location: this.location
+    };
+  }
+}
+
+export class AssignmentExpressionNode extends ExpressionNode {
+  constructor(
+    public readonly left: ExpressionNode,
+    public readonly right: ExpressionNode,
+    location?: SourceLocation
+  ) {
+    super('AssignmentExpression', location);
+  }
+
+  toJSON(): Record<string, any> {
+    return {
+      type: this.type,
+      left: this.left.toJSON(),
+      right: this.right.toJSON(),
+      location: this.location
+    };
+  }
+}
+
+export class CallExpressionNode extends ExpressionNode {
+  constructor(
+    public readonly callee: ExpressionNode,
+    public readonly args: ExpressionNode[],
+    location?: SourceLocation
+  ) {
+    super('CallExpression', location);
+  }
+
+  toJSON(): Record<string, any> {
+    return {
+      type: this.type,
+      callee: this.callee.toJSON(),
+      arguments: this.args.map(arg => arg.toJSON()),
+      location: this.location
+    };
+  }
+}
+
+export class MemberExpressionNode extends ExpressionNode {
+  constructor(
+    public readonly object: ExpressionNode,
+    public readonly property: ExpressionNode,
+    public readonly computed: boolean = false,
+    location?: SourceLocation
+  ) {
+    super('MemberExpression', location);
+  }
+
+  toJSON(): Record<string, any> {
+    return {
+      type: this.type,
+      object: this.object.toJSON(),
+      property: this.property.toJSON(),
+      computed: this.computed,
+      location: this.location
+    };
+  }
+}
+
 // Statement nodes
 export abstract class StatementNode extends ASTNode {
   constructor(type: string, location?: SourceLocation) {
@@ -113,6 +193,61 @@ export class BlockStatementNode extends StatementNode {
     return {
       type: this.type,
       statements: this.statements.map(stmt => stmt.toJSON()),
+      location: this.location
+    };
+  }
+}
+
+export class ExpressionStatementNode extends StatementNode {
+  constructor(
+    public readonly expression: ExpressionNode,
+    location?: SourceLocation
+  ) {
+    super('ExpressionStatement', location);
+  }
+
+  toJSON(): Record<string, any> {
+    return {
+      type: this.type,
+      expression: this.expression.toJSON(),
+      location: this.location
+    };
+  }
+}
+
+export class VariableDeclarationNode extends StatementNode {
+  constructor(
+    public readonly declarationType: TypeNode,
+    public readonly name: string,
+    public readonly initializer?: ExpressionNode,
+    location?: SourceLocation
+  ) {
+    super('VariableDeclaration', location);
+  }
+
+  toJSON(): Record<string, any> {
+    return {
+      type: this.type,
+      declarationType: this.declarationType.toJSON(),
+      name: this.name,
+      initializer: this.initializer?.toJSON(),
+      location: this.location
+    };
+  }
+}
+
+export class ReturnStatementNode extends StatementNode {
+  constructor(
+    public readonly argument?: ExpressionNode,
+    location?: SourceLocation
+  ) {
+    super('ReturnStatement', location);
+  }
+
+  toJSON(): Record<string, any> {
+    return {
+      type: this.type,
+      argument: this.argument?.toJSON(),
       location: this.location
     };
   }

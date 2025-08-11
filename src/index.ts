@@ -5,8 +5,15 @@
 import { Lexer } from './lexer/lexer';
 import { Parser } from './parser/parser';
 import { CompilationUnitNode } from './ast/nodes';
+import { SemanticAnalyzer, AnalysisResult } from './semantic/analyzer';
 
 export class WebSharpCompiler {
+  private semanticAnalyzer: SemanticAnalyzer;
+
+  constructor() {
+    this.semanticAnalyzer = new SemanticAnalyzer();
+  }
+
   public compile(source: string): CompilationUnitNode {
     // Phase 1: Lexical analysis
     const lexer = new Lexer(source);
@@ -17,6 +24,14 @@ export class WebSharpCompiler {
     const ast = parser.parse();
 
     return ast;
+  }
+
+  public analyze(source: string): AnalysisResult {
+    // First compile to get the AST
+    const ast = this.compile(source);
+    
+    // Then perform semantic analysis with original source
+    return this.semanticAnalyzer.analyzeWithSource(ast, source);
   }
 
   public compileToJson(source: string): string {
@@ -30,6 +45,7 @@ export { Lexer } from './lexer/lexer';
 export { Parser, ParseError } from './parser/parser';
 export { TokenType, Token } from './lexer/tokens';
 export * from './ast/nodes';
+export { SemanticAnalyzer, SemanticError, AnalysisResult } from './semantic/analyzer';
 
 // Main function for CLI usage
 export async function main(): Promise<void> {

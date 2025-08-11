@@ -1,41 +1,52 @@
 # Web# Programming Language Compiler
 
 ![CI](https://github.com/SantasLair/WebSharp/workflows/CI/badge.svg)
-![Tests](https://img.shields.io/badge/tests-9%2F9%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-26%2F26%20passing-brightgreen)
 ![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
 
 A C#-like programming language that transpiles to JavaScript for browser-native development.
 
-## Project Status: Phase 1 Complete ✅ - Ready for Phase 2
+## Project Status: Phase 2 Complete ✅ - Ready for Phase 3
 
 **Phase 1: Minimal Parser & AST (Week 1-2)** - **COMPLETED** ✅  
-**Phase 2: Type System & Semantic Analysis (Week 3-4)** - **READY TO START** 🚀
+**Phase 2: Type System & Semantic Analysis (Week 3-4)** - **COMPLETED** ✅  
+**Phase 3: JavaScript Code Generation (Week 5-6)** - **READY TO START** 🚀
 
-### Latest Update - January 11, 2025
-- ✅ All Phase 1 milestones achieved
-- ✅ 9/9 tests passing with 100% coverage
+### Latest Update - August 11, 2025
+- ✅ All Phase 1 & Phase 2 milestones achieved
+- ✅ 26/26 tests passing with 100% coverage
+- ✅ Complete type system and semantic analysis implemented
+- ✅ Symbol table tracking and type checking operational
 - ✅ CI/CD pipeline operational
-- ✅ Integration tests successful
-- 🚀 Foundation ready for Phase 2 implementation
+- 🚀 Foundation ready for Phase 3 implementation
 
 ### What's Working
 
 - **Lexer**: Tokenizes Web# keywords, identifiers, operators, and punctuation
 - **Parser**: Builds Abstract Syntax Tree for classes, properties, methods, and basic types
 - **AST Output**: Generates clean JSON representation of parsed code
-- **Error Handling**: Meaningful error messages with line/column information
+- **Symbol Table**: Tracks classes, methods, fields, and variables across compilation units
+- **Type Checking**: Validates assignments, method calls, parameter types, and return types
+- **Semantic Analysis**: Resolves references and detects semantic errors
+- **Type Inference**: Smart `var` keyword support with type inference from assignments and method calls
+- **Error Handling**: Meaningful error messages with line/column information and context
 
 ### Target Web# Syntax Support
 
-The compiler successfully parses the target syntax from the project specifications:
+The compiler successfully parses and analyzes the target syntax from the project specifications:
 
 ```csharp
-public class Person {
-    public string Name { get; set; }
-    public int Age;
+public class Calculator {
+    public int Add(int a, int b) {
+        return a + b;
+    }
     
-    public void SayHello() {
-        Console.WriteLine("Hello");
+    public void Test() {
+        int result = Add(1, 2);          // ✅ Valid: proper types
+        string bad = Add(1, 2);          // ❌ Error: int to string
+        var inferred = Add(5, 10);       // ✅ Valid: inferred as int
+        Add(1);                          // ❌ Error: wrong parameter count
+        NonExistent();                   // ❌ Error: method not found
     }
 }
 ```
@@ -45,12 +56,18 @@ public class Person {
 - **Access Modifiers**: `public`, `private`, `protected`, `internal`
 - **Class Modifiers**: `static`, `abstract`, `virtual`, `override`
 - **Types**: `int`, `double`, `string`, `bool`, `object`, `dynamic`, `void`
-- **Nullable Types**: `string?`, `int?` with `?` operator
+- **Nullable Types**: `string?`, `int?` with `?` operator and null assignment validation
 - **Class Members**:
   - Auto-implemented properties with `get`/`set`
   - Fields with optional initializers
   - Methods with parameters and return types
 - **Inheritance**: Base classes and interfaces (basic parsing)
+- **Type System**:
+  - Symbol table tracking for all identifiers
+  - Type checking for assignments and method calls
+  - Parameter count and type validation
+  - Return type validation
+  - Type inference for `var` declarations
 
 ### Usage
 
@@ -82,12 +99,15 @@ src/
 │   ├── tokens.ts         # Token type definitions
 │   └── lexer.ts          # Lexical analysis
 ├── parser/parser.ts      # Syntax analysis & AST generation
+├── semantic/
+│   ├── analyzer.ts       # Main semantic analysis orchestrator
+│   ├── source-analyzer.ts # Pattern matching and source analysis
+│   └── expression-analyzer.ts # Expression type analysis
 └── index.ts              # Main compiler entry point
 ```
 
 ### Next Phases
 
-- **Phase 2**: Type System & Semantic Analysis
 - **Phase 3**: JavaScript Code Generation  
 - **Phase 4**: Basic Browser Interop
 - **Phase 5**: CLI Tooling
@@ -96,10 +116,39 @@ src/
 
 ### Success Criteria Met
 
-✅ **Lexer tokenizes Web# keywords, identifiers, operators** - 2 passing tests  
-✅ **Parser builds AST for classes, properties, methods, basic types** - 6 passing tests  
-✅ **Can output parsed AST as JSON** - JSON serialization working perfectly  
-✅ **Unit tests for parser edge cases** - 9/9 tests passing including error handling
+✅ **Phase 1: Lexer tokenizes Web# keywords, identifiers, operators** - 2 passing tests  
+✅ **Phase 1: Parser builds AST for classes, properties, methods, basic types** - 6 passing tests  
+✅ **Phase 1: Can output parsed AST as JSON** - JSON serialization working perfectly  
+✅ **Phase 1: Unit tests for parser edge cases** - 9/9 tests passing including error handling
+
+✅ **Phase 2: Symbol Table & Resolution** - 3 passing tests
+  - Class symbol tracking
+  - Method symbols and parameters  
+  - Variable reference resolution
+
+✅ **Phase 2: Type Checking** - 5 passing tests
+  - Type mismatch detection in assignments
+  - Invalid method call detection
+  - Parameter count mismatch detection
+  - Parameter type mismatch detection
+  - Return type validation
+
+✅ **Phase 2: Type Inference** - 3 passing tests
+  - `var` type inference from assignment
+  - `var` type inference from method calls
+  - Error on `var` without initializer
+
+✅ **Phase 2: Nullable Types** - 2 passing tests
+  - Allow null assignment to nullable types
+  - Error on null assignment to non-nullable types
+
+✅ **Phase 2: Inheritance & Polymorphism** - 2 passing tests
+  - Inherited member resolution
+  - Invalid override detection
+
+✅ **Phase 2: Error Messages** - 2 passing tests
+  - Meaningful error messages with locations
+  - Multiple error handling in same file
 
 ### Test Results - ALL PASSING ✅
 
@@ -108,10 +157,10 @@ npm test
 ```
 
 ```
-Test Suites: 1 passed, 1 total
-Tests:       9 passed, 9 total
+Test Suites: 2 passed, 2 total
+Tests:       26 passed, 26 total
 Snapshots:   0 total
-Time:        1.12 s
+Time:        1.627 s
 
 Phase 1: Minimal Parser & AST
   Lexer
@@ -126,43 +175,75 @@ Phase 1: Minimal Parser & AST
   Error Handling
     ✓ should throw meaningful error for invalid syntax (9 ms)
     ✓ should include line and column information in errors
+
+Phase 2: Type System & Semantic Analysis
+  Symbol Table & Resolution
+    ✓ should track class symbols (70 ms)
+    ✓ should track method symbols and parameters (3 ms)
+    ✓ should resolve variable references (4 ms)
+  Type Checking
+    ✓ should detect type mismatch in assignment (7 ms)
+    ✓ should detect invalid method call (6 ms)
+    ✓ should detect parameter count mismatch (7 ms)
+    ✓ should detect parameter type mismatch (6 ms)
+    ✓ should validate return type (2 ms)
+  Type Inference
+    ✓ should infer var type from assignment (3 ms)
+    ✓ should infer var type from method call (6 ms)
+    ✓ should error on var without initializer (2 ms)
+  Nullable Types
+    ✓ should allow null assignment to nullable types (2 ms)
+    ✓ should error on null assignment to non-nullable types (1 ms)
+  Inheritance & Polymorphism
+    ✓ should resolve inherited members (10 ms)
+    ✓ should detect invalid override (4 ms)
+  Error Messages
+    ✓ should provide meaningful error messages with location (3 ms)
+    ✓ should handle multiple errors in same file (7 ms)
 ```
 
-**Status: Phase 1 COMPLETE with 100% test coverage!**
+**Status: Phase 1 & Phase 2 COMPLETE with 100% test coverage!**
 
-### 🚀 **Next Steps - Phase 2 Implementation**
+### 🚀 **Next Steps - Phase 3 Implementation**
 
-**Phase 2: Type System & Semantic Analysis (Weeks 3-4)**
-- **Symbol Table**: Track classes, methods, variables across compilation units
-- **Type Checker**: Validate assignments, method calls, and type compatibility
-- **Semantic Analysis**: Resolve references and detect semantic errors
-- **Enhanced Error Reporting**: Meaningful error messages with context
-- **Type Inference**: Basic `var` keyword support
+**Phase 3: JavaScript Code Generation (Weeks 5-6)**
+- **Code Generator**: Transform AST to clean, readable JavaScript
+- **Type Mapping**: Map Web# types to JavaScript equivalents
+- **Class Translation**: Convert Web# classes to JavaScript classes/prototypes
+- **Method Translation**: Handle method calls, parameters, and return values
+- **Source Maps**: Generate source maps for debugging
 
-**Target for Phase 2**: Detect type errors and resolve references
+**Target for Phase 3**: Generate working JavaScript from Web# code
 ```csharp
 public class Calculator {
     public int Add(int a, int b) {
-        return a + b; // Should validate types
+        return a + b;
     }
-    
-    public void Test() {
-        string result = Add(1, 2); // Should error: int to string
+}
+```
+↓ Transpiles to ↓
+```javascript
+class Calculator {
+    Add(a, b) {
+        return a + b;
     }
 }
 ```
 
 ### 📋 **Development Roadmap**
 
-**Immediate Next Phase (Phase 2):**
-- [ ] Implement symbol table for scope management
-- [ ] Build type checking system
-- [ ] Add semantic analysis pass
-- [ ] Enhance error reporting with context
-- [ ] Add basic type inference for `var`
+**Completed Phases:**
+- ✅ **Phase 1**: Minimal Parser & AST (Weeks 1-2) - COMPLETE
+- ✅ **Phase 2**: Type System & Semantic Analysis (Weeks 3-4) - COMPLETE
+
+**Immediate Next Phase (Phase 3):**
+- [ ] Implement JavaScript code generator
+- [ ] Build type mapping system (Web# → JavaScript)
+- [ ] Add class and method translation
+- [ ] Generate source maps for debugging
+- [ ] Add output formatting and optimization
 
 **Future Phases:**
-- **Phase 3**: JavaScript Code Generation (Weeks 5-6)
 - **Phase 4**: Basic Browser Interop (Weeks 7-8) 
 - **Phase 5**: CLI Tooling (Weeks 9-10)
 - **Phase 6**: Enhanced Language Features (Weeks 11-12)
@@ -197,12 +278,12 @@ The CI pipeline ensures code quality and prevents regressions before merging cha
 ### 🎯 **Project Health & Status**
 
 [![CI](https://github.com/SantasLair/WebSharp/workflows/CI/badge.svg)](https://github.com/SantasLair/WebSharp/actions)
-[![Tests](https://img.shields.io/badge/tests-9%2F9%20passing-brightgreen)](https://github.com/SantasLair/WebSharp)
+[![Tests](https://img.shields.io/badge/tests-26%2F26%20passing-brightgreen)](https://github.com/SantasLair/WebSharp)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/SantasLair/WebSharp)
-[![Phase](https://img.shields.io/badge/phase-1%20complete-success)](https://github.com/SantasLair/WebSharp)
+[![Phase](https://img.shields.io/badge/phase-2%20complete-success)](https://github.com/SantasLair/WebSharp)
 
-**Last Updated**: January 11, 2025  
-**Current Phase**: Phase 1 ✅ Complete | Phase 2 🚀 Ready to Start  
+**Last Updated**: August 11, 2025  
+**Current Phase**: Phase 2 ✅ Complete | Phase 3 🚀 Ready to Start  
 **Contributors**: Welcome! See project-specs.md for implementation details
 
-The foundation is solid and ready for Phase 2 implementation!
+The foundation is solid with full type system and semantic analysis complete. Ready for Phase 3 implementation!
