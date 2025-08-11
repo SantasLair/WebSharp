@@ -1,0 +1,30 @@
+{
+  "name": "websharp-compiler",
+  "version": "0.1.0",
+  "description": "Web# Programming Language Compiler - C# syntax for browser-native development",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "clean": "rimraf dist",
+    "start": "node dist/index.js",
+    "lint": "echo 'No linting configured yet'",
+    "validate": "npm run build && npm run test && node test-compiler.js"
+  },
+  "keywords": ["websharp", "compiler", "transpiler", "csharp", "javascript", "browser"],
+  "author": "WebSharp Project",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^29.5.5",
+    "@types/node": "^20.6.0",
+    "jest": "^29.7.0",
+    "rimraf": "^5.0.5",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {}
+}
