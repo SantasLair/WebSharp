@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 6: TypeScript Import Vision for WebSharp</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        h2 {
+            color: #3498db;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .vision-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 5px solid #3498db;
+        }
+        .code-example {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+        }
+        .typescript-code {
+            background: #264653;
+            border-left: 5px solid #2a9d8f;
+        }
+        .websharp-code {
+            background: #7209b7;
+            border-left: 5px solid #f72585;
+        }
+        .benefits {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .benefit-card {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid #2196f3;
+        }
+        .implementation-phase {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 5px solid #ff9800;
+        }
+        .highlight {
+            background: #ffeaa7;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .demo-button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: background 0.3s;
+        }
+        .demo-button:hover {
+            background: #2980b9;
+        }
+        .output-area {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Phase 6: TypeScript Type Import System</h1>
+        
+        <div class="vision-section">
+            <h2>The Vision</h2>
+            <p>Imagine writing WebSharp code that can seamlessly import and use TypeScript type definitions, bringing the entire TypeScript ecosystem to C# developers. This would be revolutionary - combining the familiar C# syntax with the rich type definitions from thousands of TypeScript libraries.</p>
+        </div>
+
+        <h2>🔷 Import Syntax</h2>
+        <div class="code-example websharp-code">
+// Import specific types from TypeScript definition files
+using TypeScript from "@types/dom" import { HTMLElement, MouseEvent };
+using TypeScript from "@types/node" import { Process, Buffer };
+using TypeScript from "./api-types.d.ts" import { UserAPI, ProductData };
+
+// Import entire modules with type information
+using TypeScript module "lodash" as _;
+using TypeScript module "axios" as Http;
+        </div>
+
+        <h2>📋 TypeScript Definitions Example</h2>
+        <div class="code-example typescript-code">
+// From @types/dom
+interface HTMLElement extends Element {
+    accessKey: string;
+    className: string;
+    innerHTML: string;
+    style: CSSStyleDeclaration;
+    textContent: string | null;
+    addEventListener(type: string, listener: EventListener): void;
+    click(): void;
+}
+
+interface MouseEvent extends Event {
+    button: number;
+    clientX: number;
+    clientY: number;
+}
+        </div>
+
+        <h2>🎯 WebSharp Code Using Imported Types</h2>
+        <div class="code-example websharp-code">
+using TypeScript from "@types/dom" import { HTMLElement, MouseEvent };
+
+public class TypeSafeWebApp {
+    public static void CreateInteractiveButton() {
+        // Type-safe DOM manipulation with full IntelliSense
+        HTMLElement button = JS.Call&lt;HTMLElement&gt;("document.createElement", "button");
+        
+        button.textContent = "Click me!";
+        button.className = "interactive-btn";
+        
+        // Typed event handling
+        button.addEventListener("click", (MouseEvent e) => {
+            HandleButtonClick(e);
+        });
+        
+        JS.Call("document.body.appendChild", button);
+    }
+    
+    public static void HandleButtonClick(MouseEvent event) {
+        HTMLElement target = event.target as HTMLElement;
+        
+        // Type-safe property access
+        target.textContent = "Clicked!";
+        target.style.backgroundColor = "#28a745";
+        
+        // Log with type safety
+        JS.Call("console.log", $"Clicked at ({event.clientX}, {event.clientY})");
+    }
+}
+        </div>
+
+        <h2>🌐 Advanced API Integration</h2>
+        <div class="code-example websharp-code">
+using TypeScript from "./api-types.d.ts" import { User, ApiResponse };
+using TypeScript module "axios" as Http;
+
+public class UserAPI {
+    public async Task&lt;User[]&gt; GetUsersAsync() {
+        // Type-safe HTTP calls with proper response typing
+        ApiResponse&lt;User[]&gt; response = await JS.CallAsync&lt;ApiResponse&lt;User[]&gt;&gt;(
+            "Http.get", "https://api.example.com/users"
+        );
+        
+        return response.data;
+    }
+}
+        </div>
+
+        <h2>✨ Key Benefits</h2>
+        <div class="benefits">
+            <div class="benefit-card">
+                <h3>🎯 Type Safety</h3>
+                <p>Full compile-time type checking for JavaScript APIs using imported TypeScript definitions.</p>
+            </div>
+            <div class="benefit-card">
+                <h3>🌍 Ecosystem Access</h3>
+                <p>Access to thousands of @types/* packages and the entire TypeScript ecosystem.</p>
+            </div>
+            <div class="benefit-card">
+                <h3>🔧 IntelliSense</h3>
+                <p>Full IntelliSense support for all imported types, properties, and methods.</p>
+            </div>
+            <div class="benefit-card">
+                <h3>🚀 Developer Experience</h3>
+                <p>Familiar C# syntax combined with rich JavaScript library types.</p>
+            </div>
+        </div>
+
+        <h2>🔧 Implementation Phases</h2>
+        <div class="implementation-phase">
+            <strong>Phase 6.1:</strong> TypeScript Definition Parser - Parse .d.ts files using TypeScript compiler API
+        </div>
+        <div class="implementation-phase">
+            <strong>Phase 6.2:</strong> Import Syntax & AST Extensions - Add TypeScript import syntax to lexer/parser
+        </div>
+        <div class="implementation-phase">
+            <strong>Phase 6.3:</strong> Type System Integration - Map TypeScript types to WebSharp types
+        </div>
+        <div class="implementation-phase">
+            <strong>Phase 6.4:</strong> Enhanced JavaScript Interop - Generic JS.Call&lt;T&gt;() methods
+        </div>
+        <div class="implementation-phase">
+            <strong>Phase 6.5:</strong> Tooling & Developer Experience - IntelliSense and error reporting
+        </div>
+
+        <div class="vision-section">
+            <h2>🎯 The Ultimate Goal</h2>
+            <p>This would make WebSharp the <span class="highlight">first language to seamlessly bridge C# syntax with the entire TypeScript ecosystem</span>. C# developers could write web applications using familiar syntax while having access to all the rich type definitions and libraries that make TypeScript so powerful.</p>
+            
+            <p>Imagine being able to use libraries like Lodash, Axios, React types, Node.js types, and thousands of other packages - all with full type safety and IntelliSense in a C#-like syntax!</p>
+        </div>
+
+        <h2>🚀 Interactive Demo</h2>
+        <button class="demo-button" onclick="demoTypeSafeDOM()">Demo Type-Safe DOM</button>
+        <button class="demo-button" onclick="demoAPIIntegration()">Demo API Integration</button>
+        <button class="demo-button" onclick="demoLibraryUsage()">Demo Library Usage</button>
+        
+        <div class="output-area" id="demo-output">
+            Click a demo button to see WebSharp with TypeScript types in action!
+        </div>
+    </div>
+
+    <script>
+        function demoTypeSafeDOM() {
+            const output = document.getElementById('demo-output');
+            output.innerHTML = `
+<span style="color: #4CAF50;">✅ Type-Safe DOM Demo</span>
+
+// WebSharp code with imported TypeScript types
+HTMLElement button = JS.Call&lt;HTMLElement&gt;("document.createElement", "button");
+button.textContent = "Type-safe button!";
+button.style.backgroundColor = "#3498db";
+
+// IntelliSense would show all HTMLElement properties:
+// - button.accessKey
+// - button.className  
+// - button.innerHTML
+// - button.addEventListener(...)
+// And full type checking at compile time!
+
+<span style="color: #FFA726;">🎯 Result: No more runtime errors from typos in DOM property names!</span>
+            `;
+        }
+
+        function demoAPIIntegration() {
+            const output = document.getElementById('demo-output');
+            output.innerHTML = `
+<span style="color: #4CAF50;">✅ API Integration Demo</span>
+
+// Using imported TypeScript API types
+public async Task&lt;User[]&gt; GetUsersAsync() {
+    ApiResponse&lt;User[]&gt; response = await JS.CallAsync&lt;ApiResponse&lt;User[]&gt;&gt;(
+        "Http.get", "/api/users"
+    );
+    
+    // Full type safety - response.data is guaranteed to be User[]
+    return response.data;
+}
+
+// The User interface was imported from TypeScript definitions:
+// interface User {
+//     id: number;
+//     name: string;
+//     email: string;
+// }
+
+<span style="color: #FFA726;">🎯 Result: Type-safe API calls with compile-time validation!</span>
+            `;
+        }
+
+        function demoLibraryUsage() {
+            const output = document.getElementById('demo-output');
+            output.innerHTML = `
+<span style="color: #4CAF50;">✅ Library Usage Demo</span>
+
+using TypeScript module "lodash" as _;
+using TypeScript from "@types/lodash" import { Collection };
+
+public class DataProcessor {
+    public static T[] FilterData&lt;T&gt;(T[] data, Func&lt;T, bool&gt; predicate) {
+        // Using Lodash with full type safety
+        return JS.Call&lt;T[]&gt;("_.filter", data, predicate);
+    }
+    
+    public static Dictionary&lt;TKey, TValue[]&gt; GroupData&lt;TKey, TValue&gt;(
+        TValue[] data, Func&lt;TValue, TKey&gt; keySelector
+    ) {
+        return JS.Call&lt;Dictionary&lt;TKey, TValue[]&gt;&gt;("_.groupBy", data, keySelector);
+    }
+}
+
+<span style="color: #FFA726;">🎯 Result: Use any JavaScript library with full C# type safety!</span>
+            `;
+        }
+
+        // Auto-run the first demo
+        setTimeout(demoTypeSafeDOM, 1000);
+    </script>
+</body>
+</html>

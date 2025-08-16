@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSharp Button Click Counter Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .demo-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        .title {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .counter-display {
+            font-size: 4em;
+            font-weight: bold;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            min-width: 200px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+        
+        .counter-button {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .increment-btn {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            color: white;
+        }
+        
+        .increment-btn:hover {
+            background: linear-gradient(45deg, #27ae60, #229954);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+        }
+        
+        .decrement-btn {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        .decrement-btn:hover {
+            background: linear-gradient(45deg, #c0392b, #a93226);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+        
+        .reset-btn {
+            background: linear-gradient(45deg, #f39c12, #d68910);
+            color: white;
+        }
+        
+        .reset-btn:hover {
+            background: linear-gradient(45deg, #d68910, #b7950b);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4);
+        }
+        
+        .stats {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        
+        .code-info {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="title">🔢 WebSharp Counter Demo</div>
+        <div class="subtitle">Interactive Button Clicks with State Management</div>
+        
+        <div id="counter-display" class="counter-display">0</div>
+        
+        <div class="button-group">
+            <button class="counter-button increment-btn" onclick="CounterApp.Increment()">
+                ➕ Increment
+            </button>
+            <button class="counter-button decrement-btn" onclick="CounterApp.Decrement()">
+                ➖ Decrement
+            </button>
+            <button class="counter-button reset-btn" onclick="CounterApp.Reset()">
+                🔄 Reset
+            </button>
+        </div>
+        
+        <div class="button-group">
+            <button class="counter-button increment-btn" onclick="CounterApp.IncrementBy(5)">
+                ⚡ +5
+            </button>
+            <button class="counter-button increment-btn" onclick="CounterApp.IncrementBy(10)">
+                🚀 +10
+            </button>
+            <button class="counter-button decrement-btn" onclick="CounterApp.DecrementBy(5)">
+                ⚡ -5
+            </button>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-label">Total Clicks</div>
+                <div id="total-clicks" class="stat-value">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Increments</div>
+                <div id="increment-count" class="stat-value">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Decrements</div>
+                <div id="decrement-count" class="stat-value">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Max Value</div>
+                <div id="max-value" class="stat-value">0</div>
+            </div>
+        </div>
+        
+        <div class="code-info">
+            <strong>💡 How This Works:</strong><br>
+            This entire demo is powered by <strong>WebSharp code</strong> compiled to JavaScript!<br>
+            <br>
+            📝 <strong>WebSharp Source:</strong><br>
+            <code>
+            public class CounterApp {<br>
+            &nbsp;&nbsp;private static int currentValue = 0;<br>
+            &nbsp;&nbsp;private static int totalClicks = 0;<br>
+            &nbsp;&nbsp;<br>
+            &nbsp;&nbsp;public static void Increment() {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;currentValue = currentValue + 1;<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;UpdateDisplay();<br>
+            &nbsp;&nbsp;}<br>
+            }
+            </code>
+        </div>
+    </div>
+
+    <!-- WebSharp Runtime and Generated Code -->
+    <script>
+        // JavaScript Interop Runtime (Generated by WebSharp Compiler)
+        const JS = {
+            Call: function(path, ...args) {
+                const parts = path.split('.');
+                let obj = window;
+                for (let i = 0; i < parts.length - 1; i++) {
+                    obj = obj[parts[i]];
+                }
+                const method = parts[parts.length - 1];
+                return obj[method](...args);
+            },
+            
+            Set: function(obj, prop, value) {
+                obj[prop] = value;
+            },
+            
+            Get: function(obj, prop) {
+                return obj[prop];
+            }
+        };
+
+        // Console.WriteLine polyfill for Web#
+        const Console = {
+            WriteLine: function(message) {
+                console.log(message);
+            }
+        };
+
+        // Generated WebSharp Counter Application
+        class CounterApp {
+            // Static fields (simulating WebSharp private static fields)
+            static currentValue = 0;
+            static totalClicks = 0;
+            static incrementCount = 0;
+            static decrementCount = 0;
+            static maxValue = 0;
+            static minValue = 0;
+
+            // WebSharp method: public static void Increment()
+            static Increment() {
+                CounterApp.currentValue = CounterApp.currentValue + 1;
+                CounterApp.totalClicks = CounterApp.totalClicks + 1;
+                CounterApp.incrementCount = CounterApp.incrementCount + 1;
+                
+                // Update max value if needed
+                if (CounterApp.currentValue > CounterApp.maxValue) {
+                    CounterApp.maxValue = CounterApp.currentValue;
+                }
+                
+                CounterApp.UpdateDisplay();
+                CounterApp.LogAction("Incremented to " + CounterApp.currentValue);
+            }
+
+            // WebSharp method: public static void Decrement()
+            static Decrement() {
+                CounterApp.currentValue = CounterApp.currentValue - 1;
+                CounterApp.totalClicks = CounterApp.totalClicks + 1;
+                CounterApp.decrementCount = CounterApp.decrementCount + 1;
+                
+                // Update min value if needed
+                if (CounterApp.currentValue < CounterApp.minValue) {
+                    CounterApp.minValue = CounterApp.currentValue;
+                }
+                
+                CounterApp.UpdateDisplay();
+                CounterApp.LogAction("Decremented to " + CounterApp.currentValue);
+            }
+
+            // WebSharp method: public static void IncrementBy(int amount)
+            static IncrementBy(amount) {
+                CounterApp.currentValue = CounterApp.currentValue + amount;
+                CounterApp.totalClicks = CounterApp.totalClicks + 1;
+                CounterApp.incrementCount = CounterApp.incrementCount + 1;
+                
+                if (CounterApp.currentValue > CounterApp.maxValue) {
+                    CounterApp.maxValue = CounterApp.currentValue;
+                }
+                
+                CounterApp.UpdateDisplay();
+                CounterApp.LogAction("Incremented by " + amount + " to " + CounterApp.currentValue);
+            }
+
+            // WebSharp method: public static void DecrementBy(int amount)
+            static DecrementBy(amount) {
+                CounterApp.currentValue = CounterApp.currentValue - amount;
+                CounterApp.totalClicks = CounterApp.totalClicks + 1;
+                CounterApp.decrementCount = CounterApp.decrementCount + 1;
+                
+                if (CounterApp.currentValue < CounterApp.minValue) {
+                    CounterApp.minValue = CounterApp.currentValue;
+                }
+                
+                CounterApp.UpdateDisplay();
+                CounterApp.LogAction("Decremented by " + amount + " to " + CounterApp.currentValue);
+            }
+
+            // WebSharp method: public static void Reset()
+            static Reset() {
+                CounterApp.currentValue = 0;
+                CounterApp.totalClicks = CounterApp.totalClicks + 1;
+                CounterApp.UpdateDisplay();
+                CounterApp.LogAction("Reset counter to 0");
+            }
+
+            // WebSharp method: private static void UpdateDisplay()
+            static UpdateDisplay() {
+                // Update main counter display
+                let counterElement = JS.Call("document.getElementById", "counter-display");
+                JS.Set(counterElement, "textContent", CounterApp.currentValue.toString());
+                
+                // Add visual feedback based on value
+                if (CounterApp.currentValue > 0) {
+                    JS.Set(counterElement, "style", "color: #2ecc71; font-size: 4em; font-weight: bold; margin: 30px 0; padding: 20px; background: rgba(46, 204, 113, 0.2); border-radius: 15px; border: 2px solid rgba(46, 204, 113, 0.5); text-shadow: 2px 2px 4px rgba(0,0,0,0.3); min-width: 200px;");
+                } else if (CounterApp.currentValue < 0) {
+                    JS.Set(counterElement, "style", "color: #e74c3c; font-size: 4em; font-weight: bold; margin: 30px 0; padding: 20px; background: rgba(231, 76, 60, 0.2); border-radius: 15px; border: 2px solid rgba(231, 76, 60, 0.5); text-shadow: 2px 2px 4px rgba(0,0,0,0.3); min-width: 200px;");
+                } else {
+                    JS.Set(counterElement, "style", "color: white; font-size: 4em; font-weight: bold; margin: 30px 0; padding: 20px; background: rgba(255, 255, 255, 0.2); border-radius: 15px; border: 2px solid rgba(255, 255, 255, 0.3); text-shadow: 2px 2px 4px rgba(0,0,0,0.3); min-width: 200px;");
+                }
+                
+                // Update statistics
+                CounterApp.UpdateStats();
+            }
+
+            // WebSharp method: private static void UpdateStats()
+            static UpdateStats() {
+                let totalClicksElement = JS.Call("document.getElementById", "total-clicks");
+                JS.Set(totalClicksElement, "textContent", CounterApp.totalClicks.toString());
+                
+                let incrementCountElement = JS.Call("document.getElementById", "increment-count");
+                JS.Set(incrementCountElement, "textContent", CounterApp.incrementCount.toString());
+                
+                let decrementCountElement = JS.Call("document.getElementById", "decrement-count");
+                JS.Set(decrementCountElement, "textContent", CounterApp.decrementCount.toString());
+                
+                let maxValueElement = JS.Call("document.getElementById", "max-value");
+                JS.Set(maxValueElement, "textContent", CounterApp.maxValue.toString());
+            }
+
+            // WebSharp method: private static void LogAction(string message)
+            static LogAction(message) {
+                Console.WriteLine("🔢 Counter Action: " + message);
+            }
+
+            // WebSharp method: public static void Main()
+            static Main() {
+                Console.WriteLine("🚀 WebSharp Counter Application Started!");
+                Console.WriteLine("📊 Current value: " + CounterApp.currentValue);
+                CounterApp.UpdateDisplay();
+            }
+        }
+
+        // Auto-start the WebSharp application
+        CounterApp.Main();
+        
+        // Add keyboard shortcuts (bonus feature!)
+        JS.Call("document.addEventListener", "keydown", function(event) {
+            if (event.key === 'ArrowUp' || event.key === '+') {
+                CounterApp.Increment();
+            } else if (event.key === 'ArrowDown' || event.key === '-') {
+                CounterApp.Decrement();
+            } else if (event.key === 'r' || event.key === 'R') {
+                CounterApp.Reset();
+            }
+        });
+
+        console.log("🔢 WebSharp Counter Demo Loaded!");
+        console.log("🎮 Try clicking the buttons or use keyboard shortcuts:");
+        console.log("   ⬆️  Arrow Up or '+' to increment");
+        console.log("   ⬇️  Arrow Down or '-' to decrement");
+        console.log("   🔄 'R' to reset");
+    </script>
+</body>
+</html>

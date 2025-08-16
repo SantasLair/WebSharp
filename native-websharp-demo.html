@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Native WebSharp Embedded Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .demo-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 15px 0;
+            border-left: 4px solid #007acc;
+        }
+        
+        .websharp-tag {
+            background: #2d3748;
+            color: #68d391;
+            border-left: 4px solid #68d391;
+        }
+        
+        .output-area {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            min-height: 100px;
+            border: 2px dashed #007acc;
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .comparison-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            background: rgba(255, 255, 255, 0.1);
+            margin: 10px 0;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #005999;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌐 Native WebSharp Embedded Demo</h1>
+        <p>WebSharp code running directly in HTML pages</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>🎯 Vision: WebSharp as a Native Web Language</h2>
+        <p>Imagine if WebSharp could run directly in browsers, just like JavaScript:</p>
+        
+        <div class="comparison">
+            <div class="comparison-item">
+                <h3>❌ Current (JavaScript)</h3>
+                <div class="code-block">&lt;script&gt;
+function createButton() {
+  const btn = document.createElement('button');
+  btn.textContent = 'Click me!';
+  btn.onclick = () => alert('Hello!');
+  document.body.appendChild(btn);
+}
+&lt;/script&gt;</div>
+            </div>
+            
+            <div class="comparison-item">
+                <h3>✅ Future (Native WebSharp)</h3>
+                <div class="code-block websharp-tag">&lt;script type="text/websharp"&gt;
+public class ButtonDemo {
+    public static void CreateButton() {
+        var btn = JS.Call("document.createElement", "button");
+        JS.Set(btn, "textContent", "Click me!");
+        JS.Call("document.body.appendChild", btn);
+    }
+}
+&lt;/script&gt;</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>🚀 Current WebSharp Embedded Implementation</h2>
+        <p>Right now, WebSharp is embedded by compiling to JavaScript. Here's how it works:</p>
+        
+        <h3>📝 Original WebSharp Source Code:</h3>
+        <div class="code-block websharp-tag">// This is what you would write in .ws files
+public class PageController {
+    private static int clickCount = 0;
+    
+    public static void InitializePage() {
+        CreateWelcomeMessage();
+        CreateInteractiveCounter();
+        SetupEventHandlers();
+    }
+    
+    public static void CreateWelcomeMessage() {
+        var container = JS.Call("document.getElementById", "welcome-area");
+        var heading = JS.Call("document.createElement", "h2");
+        JS.Set(heading, "textContent", "🎉 Welcome to Native WebSharp!");
+        JS.Set(heading, "style", "color: #2ecc71; text-align: center;");
+        JS.Call("container.appendChild", heading);
+        
+        var description = JS.Call("document.createElement", "p");
+        JS.Set(description, "textContent", "This entire page is controlled by WebSharp code!");
+        JS.Set(description, "style", "text-align: center; font-size: 1.2em;");
+        JS.Call("container.appendChild", description);
+    }
+    
+    public static void CreateInteractiveCounter() {
+        var container = JS.Call("document.getElementById", "counter-area");
+        
+        var display = JS.Call("document.createElement", "div");
+        JS.Set(display, "id", "click-display");
+        JS.Set(display, "textContent", "Clicks: 0");
+        JS.Set(display, "style", "font-size: 2em; text-align: center; margin: 20px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 10px;");
+        
+        var button = JS.Call("document.createElement", "button");
+        JS.Set(button, "textContent", "🔔 Click Me!");
+        JS.Set(button, "style", "font-size: 1.2em; padding: 15px 30px; display: block; margin: 20px auto; cursor: pointer;");
+        JS.Set(button, "onclick", PageController.HandleButtonClick);
+        
+        JS.Call("container.appendChild", display);
+        JS.Call("container.appendChild", button);
+    }
+    
+    public static void HandleButtonClick() {
+        clickCount = clickCount + 1;
+        UpdateClickDisplay();
+        ShowClickFeedback();
+    }
+    
+    private static void UpdateClickDisplay() {
+        var display = JS.Call("document.getElementById", "click-display");
+        JS.Set(display, "textContent", "Clicks: " + clickCount);
+        
+        // Change color based on click count
+        if (clickCount < 5) {
+            JS.Set(display, "style", "font-size: 2em; text-align: center; margin: 20px; padding: 15px; background: rgba(52, 152, 219, 0.3); border-radius: 10px; color: white;");
+        } else if (clickCount < 10) {
+            JS.Set(display, "style", "font-size: 2em; text-align: center; margin: 20px; padding: 15px; background: rgba(230, 126, 34, 0.3); border-radius: 10px; color: white;");
+        } else {
+            JS.Set(display, "style", "font-size: 2em; text-align: center; margin: 20px; padding: 15px; background: rgba(231, 76, 60, 0.3); border-radius: 10px; color: white;");
+        }
+    }
+    
+    private static void ShowClickFeedback() {
+        var feedback = JS.Call("document.getElementById", "feedback-area");
+        
+        if (clickCount == 1) {
+            JS.Set(feedback, "textContent", "🎉 Great! You clicked the button!");
+        } else if (clickCount == 5) {
+            JS.Set(feedback, "textContent", "🔥 You're on fire! 5 clicks!");
+        } else if (clickCount == 10) {
+            JS.Set(feedback, "textContent", "💯 Amazing! You've reached 10 clicks!");
+        } else if (clickCount > 10) {
+            JS.Set(feedback, "textContent", "🚀 You're unstoppable! " + clickCount + " clicks and counting!");
+        }
+    }
+}</div>
+        
+        <h3>🔧 Compiled JavaScript (What Actually Runs):</h3>
+        <p>The WebSharp compiler automatically converts the above code to the JavaScript below:</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>🎮 Live WebSharp Demo</h2>
+        <p>This section is powered by the WebSharp code shown above:</p>
+        
+        <div id="welcome-area" class="output-area">
+            <!-- WebSharp will populate this area -->
+        </div>
+        
+        <div id="counter-area" class="output-area">
+            <!-- WebSharp will create interactive elements here -->
+        </div>
+        
+        <div id="feedback-area" style="text-align: center; font-size: 1.3em; margin: 20px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 10px; min-height: 60px;">
+            <!-- Dynamic feedback appears here -->
+        </div>
+        
+        <div style="text-align: center; margin: 20px;">
+            <button onclick="PageController.CreateWelcomeMessage()">🔄 Regenerate Welcome</button>
+            <button onclick="location.reload()">🔄 Reset Page</button>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>🌟 Benefits of Native WebSharp</h2>
+        <ul class="feature-list">
+            <li><strong>🎯 Familiar Syntax:</strong> Write web apps using C# syntax you already know</li>
+            <li><strong>🛡️ Type Safety:</strong> Catch errors at compile time, not runtime</li>
+            <li><strong>🏗️ Better Structure:</strong> Classes, methods, and proper OOP</li>
+            <li><strong>🔧 IntelliSense:</strong> Full IDE support with autocomplete and error detection</li>
+            <li><strong>📚 Easy Learning:</strong> No JavaScript quirks or prototype confusion</li>
+            <li><strong>🌐 Full Browser Access:</strong> All DOM and browser APIs available</li>
+            <li><strong>🚀 Performance:</strong> Compiles to optimized JavaScript</li>
+            <li><strong>🔄 Compatibility:</strong> Runs in every modern browser</li>
+        </ul>
+    </div>
+
+    <div class="demo-section">
+        <h2>🔮 Future Vision: True Native WebSharp</h2>
+        <p>Imagine a future where browsers support WebSharp natively:</p>
+        
+        <div class="code-block websharp-tag">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Native WebSharp App&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;My WebSharp App&lt;/h1&gt;
+    
+    &lt;!-- Native WebSharp execution --&gt;
+    &lt;script type="text/websharp"&gt;
+    public class App {
+        public static void Main() {
+            CreateUserInterface();
+            LoadData();
+            SetupEventHandlers();
+        }
+        
+        public static void CreateUserInterface() {
+            // WebSharp code runs directly!
+        }
+    }
+    
+    App.Main(); // Execute immediately
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</div>
+    </div>
+
+    <!-- WebSharp Runtime (Currently compiled to JavaScript) -->
+    <script>
+        // JavaScript Interop Runtime
+        const JS = {
+            Call: function(path, ...args) {
+                const parts = path.split('.');
+                let obj = window;
+                for (let i = 0; i < parts.length - 1; i++) {
+                    obj = obj[parts[i]];
+                }
+                const method = parts[parts.length - 1];
+                return obj[method](...args);
+            },
+            
+            Set: function(obj, prop, value) {
+                obj[prop] = value;
+            }
+        };
+
+        // Generated WebSharp Code (compiled from the .ws source above)
+        class PageController {
+            static clickCount = 0;
+            
+            static InitializePage() {
+                PageController.CreateWelcomeMessage();
+                PageController.CreateInteractiveCounter();
+            }
+            
+            static CreateWelcomeMessage() {
+                let container = JS.Call("document.getElementById", "welcome-area");
+                let heading = JS.Call("document.createElement", "h2");
+                JS.Set(heading, "textContent", "🎉 Welcome to Native WebSharp!");
+                JS.Set(heading, "style", "color: #2ecc71; text-align: center; margin: 0;");
+                JS.Call("container.appendChild", heading);
+                
+                let description = JS.Call("document.createElement", "p");
+                JS.Set(description, "textContent", "This entire page is controlled by WebSharp code compiled to JavaScript!");
+                JS.Set(description, "style", "text-align: center; font-size: 1.2em; margin: 15px 0;");
+                JS.Call("container.appendChild", description);
+            }
+            
+            static CreateInteractiveCounter() {
+                let container = JS.Call("document.getElementById", "counter-area");
+                
+                let display = JS.Call("document.createElement", "div");
+                JS.Set(display, "id", "click-display");
+                JS.Set(display, "textContent", "Clicks: 0");
+                JS.Set(display, "style", "font-size: 2em; text-align: center; margin: 20px 0; padding: 15px; background: rgba(52, 152, 219, 0.3); border-radius: 10px; color: #333;");
+                
+                let button = JS.Call("document.createElement", "button");
+                JS.Set(button, "textContent", "🔔 Click Me!");
+                JS.Set(button, "style", "font-size: 1.2em; padding: 15px 30px; display: block; margin: 20px auto; cursor: pointer; background: #007acc; color: white; border: none; border-radius: 5px;");
+                
+                // Set up click handler
+                JS.Call("button.addEventListener", "click", function() {
+                    PageController.HandleButtonClick();
+                });
+                
+                JS.Call("container.appendChild", display);
+                JS.Call("container.appendChild", button);
+            }
+            
+            static HandleButtonClick() {
+                PageController.clickCount = PageController.clickCount + 1;
+                PageController.UpdateClickDisplay();
+                PageController.ShowClickFeedback();
+            }
+            
+            static UpdateClickDisplay() {
+                let display = JS.Call("document.getElementById", "click-display");
+                JS.Set(display, "textContent", "Clicks: " + PageController.clickCount);
+                
+                if (PageController.clickCount < 5) {
+                    JS.Set(display, "style", "font-size: 2em; text-align: center; margin: 20px 0; padding: 15px; background: rgba(52, 152, 219, 0.3); border-radius: 10px; color: #333;");
+                } else if (PageController.clickCount < 10) {
+                    JS.Set(display, "style", "font-size: 2em; text-align: center; margin: 20px 0; padding: 15px; background: rgba(230, 126, 34, 0.3); border-radius: 10px; color: #333;");
+                } else {
+                    JS.Set(display, "style", "font-size: 2em; text-align: center; margin: 20px 0; padding: 15px; background: rgba(231, 76, 60, 0.3); border-radius: 10px; color: #333;");
+                }
+            }
+            
+            static ShowClickFeedback() {
+                let feedback = JS.Call("document.getElementById", "feedback-area");
+                
+                if (PageController.clickCount === 1) {
+                    JS.Set(feedback, "textContent", "🎉 Great! You clicked the button!");
+                } else if (PageController.clickCount === 5) {
+                    JS.Set(feedback, "textContent", "🔥 You're on fire! 5 clicks!");
+                } else if (PageController.clickCount === 10) {
+                    JS.Set(feedback, "textContent", "💯 Amazing! You've reached 10 clicks!");
+                } else if (PageController.clickCount > 10) {
+                    JS.Set(feedback, "textContent", "🚀 You're unstoppable! " + PageController.clickCount + " clicks and counting!");
+                }
+            }
+        }
+
+        // Auto-initialize the page when loaded
+        window.addEventListener('DOMContentLoaded', function() {
+            PageController.InitializePage();
+            console.log("🌐 WebSharp page controller initialized!");
+            console.log("✅ All interactive elements are now powered by WebSharp!");
+        });
+    </script>
+</body>
+</html>

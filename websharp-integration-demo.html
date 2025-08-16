@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSharp Integration Example</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        }
+        
+        .websharp-content {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            min-height: 200px;
+            border: 2px dashed #007acc;
+        }
+        
+        .websharp-content:empty::before {
+            content: "WebSharp-generated content will appear here...";
+            color: #666;
+            font-style: italic;
+        }
+        
+        button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #005999;
+        }
+        
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .comparison > div {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .websharp-logo {
+            text-align: center;
+            font-size: 3em;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="websharp-logo">🌐 Web# Integration Demo</div>
+    
+    <div class="container">
+        <h1>🚀 WebSharp vs JavaScript Integration</h1>
+        <p>This page demonstrates how WebSharp can completely replace JavaScript in web development.</p>
+        
+        <div class="comparison">
+            <div>
+                <h3>❌ Old Way (JavaScript)</h3>
+                <div class="code-block">function createCard() {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    &lt;h3&gt;JavaScript Card&lt;/h3&gt;
+    &lt;p&gt;Created with vanilla JS&lt;/p&gt;
+  `;
+  document.body.appendChild(card);
+}</div>
+            </div>
+            
+            <div>
+                <h3>✅ New Way (WebSharp)</h3>
+                <div class="code-block">public class CardBuilder {
+  public static void CreateCard() {
+    var card = JS.Call("document.createElement", "div");
+    JS.Set(card, "className", "card");
+    JS.Set(card, "innerHTML", 
+      "&lt;h3&gt;WebSharp Card&lt;/h3&gt;" +
+      "&lt;p&gt;Created with C# syntax!&lt;/p&gt;");
+    JS.Call("document.body.appendChild", card);
+  }
+}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🎮 Interactive WebSharp Demo</h2>
+        <p>Click the buttons below to see WebSharp code running live in your browser:</p>
+        
+        <button onclick="WebSharpDemo.CreateWelcomeCard()">📋 Create Welcome Card</button>
+        <button onclick="WebSharpDemo.CreateUserInfo()">👤 Show User Info</button>
+        <button onclick="WebSharpDemo.CreateColorfulList()">🌈 Create Colorful List</button>
+        <button onclick="WebSharpDemo.CreateProgressBar()">📊 Create Progress Bar</button>
+        <button onclick="WebSharpDemo.ClearContent()">🗑️ Clear All</button>
+        
+        <div id="websharp-output" class="websharp-content">
+            <!-- WebSharp-generated content appears here -->
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🔧 How WebSharp Integration Works</h2>
+        
+        <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; margin: 15px 0;">
+            <h3>Step 1: Write WebSharp Code (.ws files)</h3>
+            <div class="code-block">public class MyApp {
+    public static void Main() {
+        CreateHeader();
+        CreateContent();
+    }
+}</div>
+        </div>
+        
+        <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; margin: 15px 0;">
+            <h3>Step 2: Compile to JavaScript</h3>
+            <div class="code-block"># Compile WebSharp to JavaScript
+websharp compile my-app.ws --output my-app.js</div>
+        </div>
+        
+        <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; margin: 15px 0;">
+            <h3>Step 3: Include in HTML (Just like JavaScript!)</h3>
+            <div class="code-block">&lt;script src="my-app.js"&gt;&lt;/script&gt;
+&lt;script&gt;MyApp.Main();&lt;/script&gt;</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🌟 WebSharp Advantages Over JavaScript</h2>
+        <ul style="font-size: 1.1em; line-height: 1.6;">
+            <li><strong>🎯 Familiar Syntax:</strong> Use C# syntax you already know</li>
+            <li><strong>🛡️ Type Safety:</strong> Catch errors at compile time</li>
+            <li><strong>🏗️ Better Structure:</strong> Classes, properties, and methods</li>
+            <li><strong>🔧 IntelliSense:</strong> Better IDE support and autocomplete</li>
+            <li><strong>📚 Easy Learning:</strong> No need to learn JavaScript quirks</li>
+            <li><strong>🌐 Full Browser Access:</strong> All browser APIs available through JS.Call()</li>
+        </ul>
+    </div>
+
+    <!-- WebSharp Runtime and Generated Code -->
+    <script>
+        // JavaScript Interop Runtime (Generated by WebSharp Compiler)
+        const JS = {
+            Call: function(path, ...args) {
+                const parts = path.split('.');
+                let obj = window;
+                for (let i = 0; i < parts.length - 1; i++) {
+                    obj = obj[parts[i]];
+                }
+                const method = parts[parts.length - 1];
+                return obj[method](...args);
+            },
+            
+            Set: function(obj, prop, value) {
+                obj[prop] = value;
+            }
+        };
+
+        // Console.WriteLine polyfill for Web#
+        const Console = {
+            WriteLine: function(message) {
+                console.log(message);
+            }
+        };
+
+        // Generated WebSharp Classes
+        class WebSharpDemo {
+            static CreateWelcomeCard() {
+                const output = document.getElementById('websharp-output');
+                
+                let card = JS.Call("document.createElement", "div");
+                JS.Set(card, "style", "background: linear-gradient(45deg, #FF6B6B, #4ECDC4); padding: 20px; border-radius: 10px; margin: 10px 0; color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.2);");
+                
+                let title = JS.Call("document.createElement", "h3");
+                JS.Set(title, "textContent", "🎉 Welcome to WebSharp!");
+                JS.Set(title, "style", "margin: 0 0 10px 0; font-size: 1.5em;");
+                
+                let description = JS.Call("document.createElement", "p");
+                JS.Set(description, "textContent", "This card was created using WebSharp (C# syntax) and compiled to JavaScript!");
+                JS.Set(description, "style", "margin: 0; opacity: 0.9;");
+                
+                JS.Call("card.appendChild", title);
+                JS.Call("card.appendChild", description);
+                JS.Call("output.appendChild", card);
+            }
+            
+            static CreateUserInfo() {
+                const output = document.getElementById('websharp-output');
+                
+                let infoCard = JS.Call("document.createElement", "div");
+                JS.Set(infoCard, "style", "background: linear-gradient(45deg, #667eea, #764ba2); padding: 20px; border-radius: 10px; margin: 10px 0; color: white;");
+                
+                let userAgent = JS.Call("navigator.userAgent");
+                let screenWidth = JS.Call("screen.width");
+                let screenHeight = JS.Call("screen.height");
+                let language = JS.Call("navigator.language");
+                
+                let title = JS.Call("document.createElement", "h3");
+                JS.Set(title, "textContent", "🌐 Browser Information");
+                JS.Set(title, "style", "margin: 0 0 15px 0;");
+                
+                let info = JS.Call("document.createElement", "div");
+                JS.Set(info, "innerHTML", 
+                    "<strong>🖥️ Screen:</strong> " + screenWidth + " × " + screenHeight + " pixels<br>" +
+                    "<strong>🗣️ Language:</strong> " + language + "<br>" +
+                    "<strong>🔧 User Agent:</strong> " + userAgent.substring(0, 80) + "..."
+                );
+                JS.Set(info, "style", "line-height: 1.6; font-family: monospace; font-size: 0.9em;");
+                
+                JS.Call("infoCard.appendChild", title);
+                JS.Call("infoCard.appendChild", info);
+                JS.Call("output.appendChild", infoCard);
+            }
+            
+            static CreateColorfulList() {
+                const output = document.getElementById('websharp-output');
+                
+                let listContainer = JS.Call("document.createElement", "div");
+                JS.Set(listContainer, "style", "background: linear-gradient(45deg, #ff9a9e, #fecfef, #fecfef); padding: 20px; border-radius: 10px; margin: 10px 0;");
+                
+                let title = JS.Call("document.createElement", "h3");
+                JS.Set(title, "textContent", "🌈 WebSharp Features");
+                JS.Set(title, "style", "margin: 0 0 15px 0; color: #333;");
+                
+                let list = JS.Call("document.createElement", "ul");
+                JS.Set(list, "style", "margin: 0; padding-left: 20px; color: #333;");
+                
+                const features = ["C# Syntax", "Type Safety", "DOM Manipulation", "Browser APIs", "Compile-time Errors"];
+                const colors = ["#e74c3c", "#f39c12", "#2ecc71", "#3498db", "#9b59b6"];
+                
+                for (let i = 0; i < features.length; i++) {
+                    let item = JS.Call("document.createElement", "li");
+                    JS.Set(item, "textContent", features[i]);
+                    JS.Set(item, "style", "margin: 8px 0; padding: 8px; background: " + colors[i] + "; color: white; border-radius: 5px; list-style: none;");
+                    JS.Call("list.appendChild", item);
+                }
+                
+                JS.Call("listContainer.appendChild", title);
+                JS.Call("listContainer.appendChild", list);
+                JS.Call("output.appendChild", listContainer);
+            }
+            
+            static CreateProgressBar() {
+                const output = document.getElementById('websharp-output');
+                
+                let progressContainer = JS.Call("document.createElement", "div");
+                JS.Set(progressContainer, "style", "background: linear-gradient(45deg, #2193b0, #6dd5ed); padding: 20px; border-radius: 10px; margin: 10px 0; color: white;");
+                
+                let title = JS.Call("document.createElement", "h3");
+                JS.Set(title, "textContent", "📊 WebSharp Development Progress");
+                JS.Set(title, "style", "margin: 0 0 15px 0;");
+                
+                const phases = [
+                    { name: "Phase 1: Parser & AST", progress: 100 },
+                    { name: "Phase 2: Type System", progress: 100 },
+                    { name: "Phase 3: Code Generation", progress: 100 },
+                    { name: "Phase 4: Browser Interop", progress: 100 },
+                    { name: "Phase 5: CLI Tooling", progress: 0 }
+                ];
+                
+                for (let i = 0; i < phases.length; i++) {
+                    let phaseDiv = JS.Call("document.createElement", "div");
+                    JS.Set(phaseDiv, "style", "margin: 10px 0;");
+                    
+                    let label = JS.Call("document.createElement", "div");
+                    JS.Set(label, "textContent", phases[i].name + " - " + phases[i].progress + "%");
+                    JS.Set(label, "style", "margin-bottom: 5px; font-weight: bold;");
+                    
+                    let progressBar = JS.Call("document.createElement", "div");
+                    JS.Set(progressBar, "style", "width: 100%; height: 20px; background: rgba(255,255,255,0.3); border-radius: 10px; overflow: hidden;");
+                    
+                    let progressFill = JS.Call("document.createElement", "div");
+                    JS.Set(progressFill, "style", "width: " + phases[i].progress + "%; height: 100%; background: " + (phases[i].progress === 100 ? "#2ecc71" : "#f39c12") + "; transition: width 0.5s ease;");
+                    
+                    JS.Call("progressBar.appendChild", progressFill);
+                    JS.Call("phaseDiv.appendChild", label);
+                    JS.Call("phaseDiv.appendChild", progressBar);
+                    JS.Call("progressContainer.appendChild", phaseDiv);
+                }
+                
+                JS.Call("progressContainer.appendChild", title);
+                JS.Call("output.appendChild", progressContainer);
+            }
+            
+            static ClearContent() {
+                const output = document.getElementById('websharp-output');
+                JS.Set(output, "innerHTML", "");
+            }
+        }
+
+        // Auto-run demo on page load
+        console.log("🌐 WebSharp Integration Demo Loaded!");
+        console.log("✅ WebSharp runtime is active and ready!");
+        console.log("🎮 Try clicking the buttons above to see WebSharp in action!");
+    </script>
+</body>
+</html>

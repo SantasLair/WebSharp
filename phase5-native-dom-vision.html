@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 5: Native DOM API Vision for WebSharp</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        h2 {
+            color: #3498db;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .comparison-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .approach-card {
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid;
+        }
+        .current-approach {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+        .proposed-approach {
+            background: #d1ecf1;
+            border-color: #17a2b8;
+        }
+        .code-example {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+        .websharp-code {
+            background: #7209b7;
+            border-left: 5px solid #f72585;
+        }
+        .javascript-code {
+            background: #264653;
+            border-left: 5px solid #2a9d8f;
+        }
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .benefit-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .benefit-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .demo-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 5px solid #28a745;
+        }
+        .demo-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 8px;
+            transition: all 0.3s;
+        }
+        .demo-button:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+        .output-area {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            min-height: 150px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .highlight {
+            background: #ffeaa7;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+            color: #2d3436;
+        }
+        .feature-list {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        .feature-list li {
+            padding: 5px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        .tab-container {
+            margin: 20px 0;
+        }
+        .tab-buttons {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+        }
+        .tab-button {
+            flex: 1;
+            padding: 15px;
+            background: #e9ecef;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        .tab-button.active {
+            background: #007bff;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 0 0 8px 8px;
+            border: 1px solid #dee2e6;
+            border-top: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Phase 5: Native DOM API for WebSharp</h1>
+        
+        <div class="demo-section">
+            <h2>The Vision: C#-Style Browser Objects</h2>
+            <p>Imagine writing WebSharp code that feels exactly like working with .NET objects, but for web development. Instead of the lower-level <code>JS.Call()</code> approach, you'd have native C#-style objects like <span class="highlight">Document</span>, <span class="highlight">HTMLElement</span>, <span class="highlight">HTMLButtonElement</span>, etc.</p>
+        </div>
+
+        <h2>📊 Current vs. Proposed Approach</h2>
+        <div class="comparison-section">
+            <div class="approach-card current-approach">
+                <h3>🔧 Current Phase 4: JS.Call()</h3>
+                <p><strong>Lower-level JavaScript interop</strong></p>
+                <div class="code-example">
+    var button = JS.Call("document.createElement", "button");
+    JS.Set(button, "textContent", "Click me!");
+    JS.Set(button, "style.backgroundColor", "#blue");
+    JS.Call("document.body.appendChild", button);
+                </div>
+                <p>✅ Works, but feels verbose and low-level</p>
+            </div>
+            
+            <div class="approach-card proposed-approach">
+                <h3>✨ Proposed Phase 5: Native DOM</h3>
+                <p><strong>C#-style object manipulation</strong></p>
+                <div class="code-example">
+    HTMLButtonElement button = new HTMLButtonElement();
+    button.TextContent = "Click me!";
+    button.Style.BackgroundColor = "#blue";
+    Document.Body.AppendChild(button);
+                </div>
+                <p>🎯 Natural, familiar, and type-safe!</p>
+            </div>
+        </div>
+
+        <h2>🌟 Key Benefits</h2>
+        <div class="benefits-grid">
+            <div class="benefit-card">
+                <div class="benefit-icon">🎯</div>
+                <h3>Natural C# Feel</h3>
+                <p>DOM objects work exactly like .NET objects that C# developers already know</p>
+            </div>
+            <div class="benefit-card">
+                <div class="benefit-icon">🔧</div>
+                <h3>Full IntelliSense</h3>
+                <p>Complete autocompletion for all DOM properties, methods, and events</p>
+            </div>
+            <div class="benefit-card">
+                <div class="benefit-icon">🛡️</div>
+                <h3>Type Safety</h3>
+                <p>Compile-time checking for property names, types, and method signatures</p>
+            </div>
+            <div class="benefit-card">
+                <div class="benefit-icon">🚀</div>
+                <h3>Better Productivity</h3>
+                <p>Less verbose code, fewer errors, faster development</p>
+            </div>
+            <div class="benefit-card">
+                <div class="benefit-icon">🎮</div>
+                <h3>C# Events</h3>
+                <p>Natural event handling with += operator and strongly-typed event args</p>
+            </div>
+            <div class="benefit-card">
+                <div class="benefit-icon">📚</div>
+                <h3>Familiar API</h3>
+                <p>C# developers can use existing knowledge without learning new syntax</p>
+            </div>
+        </div>
+
+        <h2>💡 Interactive Examples</h2>
+        <div class="tab-container">
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="showTab('button-demo')">Simple Button</button>
+                <button class="tab-button" onclick="showTab('form-demo')">Login Form</button>
+                <button class="tab-button" onclick="showTab('todo-demo')">Todo List</button>
+                <button class="tab-button" onclick="showTab('api-demo')">Browser APIs</button>
+            </div>
+            
+            <div id="button-demo" class="tab-content active">
+                <h3>Simple Button Creation</h3>
+                <div class="code-example websharp-code">
+    public class ButtonDemo {
+        public static void Main() {
+            HTMLButtonElement button = new HTMLButtonElement();
+            button.TextContent = "Click me!";
+            button.Style.BackgroundColor = "#007bff";
+            button.Style.Color = "white";
+            button.Style.Padding = "10px 20px";
+            
+            // Type-safe event handling
+            button.Click += (sender, e) => {
+                button.TextContent = "Clicked!";
+                button.Style.BackgroundColor = "#28a745";
+            };
+            
+            Document.Body.AppendChild(button);
+        }
+    }
+                </div>
+                <p><strong>Benefits:</strong> Clean syntax, type-safe events, IntelliSense for all properties</p>
+            </div>
+            
+            <div id="form-demo" class="tab-content">
+                <h3>Login Form with Validation</h3>
+                <div class="code-example websharp-code">
+    public class FormDemo {
+        public static void CreateLoginForm() {
+            HTMLDivElement container = new HTMLDivElement();
+            container.Style.Padding = "20px";
+            container.Style.MaxWidth = "400px";
+            
+            HTMLInputElement nameInput = new HTMLInputElement("text");
+            nameInput.Placeholder = "Enter your name";
+            nameInput.Style.Width = "100%";
+            nameInput.Style.Padding = "10px";
+            
+            HTMLButtonElement submitButton = new HTMLButtonElement();
+            submitButton.TextContent = "Submit";
+            
+            submitButton.Click += (sender, e) => {
+                if (string.IsNullOrEmpty(nameInput.Value)) {
+                    nameInput.Style.BorderColor = "#dc3545";
+                    Window.Alert("Please enter your name");
+                    return;
+                }
+                // Process form...
+            };
+            
+            container.AppendChild(nameInput);
+            container.AppendChild(submitButton);
+            Document.Body.AppendChild(container);
+        }
+    }
+                </div>
+                <p><strong>Benefits:</strong> Familiar validation patterns, type-safe form handling</p>
+            </div>
+            
+            <div id="todo-demo" class="tab-content">
+                <h3>Dynamic Todo List Application</h3>
+                <div class="code-example websharp-code">
+    public class TodoListDemo {
+        private static HTMLDivElement todoList;
+        
+        public static void CreateTodoApp() {
+            HTMLDivElement app = new HTMLDivElement();
+            
+            HTMLInputElement newTodoInput = new HTMLInputElement("text");
+            newTodoInput.Placeholder = "Add a new todo...";
+            
+            HTMLButtonElement addButton = new HTMLButtonElement();
+            addButton.TextContent = "Add";
+            
+            todoList = new HTMLDivElement();
+            
+            addButton.Click += (sender, e) => {
+                string todoText = newTodoInput.Value.Trim();
+                if (!string.IsNullOrEmpty(todoText)) {
+                    HTMLDivElement todoItem = CreateTodoItem(todoText);
+                    todoList.AppendChild(todoItem);
+                    newTodoInput.Value = "";
+                }
+            };
+            
+            app.AppendChild(newTodoInput);
+            app.AppendChild(addButton);
+            app.AppendChild(todoList);
+            Document.Body.AppendChild(app);
+        }
+    }
+                </div>
+                <p><strong>Benefits:</strong> Object-oriented approach, clean state management</p>
+            </div>
+            
+            <div id="api-demo" class="tab-content">
+                <h3>Browser APIs Integration</h3>
+                <div class="code-example websharp-code">
+    public class BrowserAPIDemo {
+        public static void ShowBrowserInfo() {
+            HTMLDivElement container = new HTMLDivElement();
+            
+            // Window information
+            container.InnerHTML = $@"
+                &lt;h2&gt;Browser Information&lt;/h2&gt;
+                &lt;p&gt;&lt;strong&gt;URL:&lt;/strong&gt; {Window.Location.Href}&lt;/p&gt;
+                &lt;p&gt;&lt;strong&gt;User Agent:&lt;/strong&gt; {Navigator.UserAgent}&lt;/p&gt;
+                &lt;p&gt;&lt;strong&gt;Screen:&lt;/strong&gt; {Screen.Width} x {Screen.Height}&lt;/p&gt;
+            ";
+            
+            // Local Storage
+            HTMLButtonElement saveButton = new HTMLButtonElement();
+            saveButton.TextContent = "Save to LocalStorage";
+            saveButton.Click += (sender, e) => {
+                LocalStorage.SetItem("demo", "WebSharp rocks!");
+                Window.Alert("Saved to localStorage!");
+            };
+            
+            container.AppendChild(saveButton);
+            Document.Body.AppendChild(container);
+        }
+    }
+                </div>
+                <p><strong>Benefits:</strong> Direct access to all browser APIs with type safety</p>
+            </div>
+        </div>
+
+        <h2>🏗️ Implementation Architecture</h2>
+        <div class="feature-list">
+            <h3>Core DOM Classes</h3>
+            <ul>
+                <li><strong>Document:</strong> Static class with CreateElement(), QuerySelector(), etc.</li>
+                <li><strong>Element:</strong> Base class with common properties (Id, ClassName, Style)</li>
+                <li><strong>HTMLElement:</strong> Enhanced base with web-specific properties</li>
+                <li><strong>Specific Elements:</strong> HTMLButtonElement, HTMLInputElement, HTMLDivElement, etc.</li>
+                <li><strong>CSSStyleDeclaration:</strong> Type-safe CSS property access</li>
+                <li><strong>Events:</strong> MouseEvent, KeyboardEvent with C# event handlers</li>
+            </ul>
+        </div>
+
+        <h2>🎯 Generated JavaScript Runtime</h2>
+        <div class="code-example javascript-code">
+    // WebSharp DOM Runtime Bridge
+    const WebSharpDOM = {
+        Document: {
+            CreateElement: function(tagName, type) {
+                const element = document.createElement(tagName);
+                return new WebSharpElement(element, type || 'Element');
+            },
+            
+            get Body() {
+                return new WebSharpElement(document.body, 'HTMLElement');
+            }
+        },
+        
+        WebSharpElement: class {
+            constructor(domElement, type) {
+                this._dom = domElement;
+                this._type = type;
+            }
+            
+            get TextContent() { return this._dom.textContent; }
+            set TextContent(value) { this._dom.textContent = value; }
+            
+            get Style() {
+                return new WebSharpCSSStyleDeclaration(this._dom.style);
+            }
+            
+            AppendChild(child) {
+                this._dom.appendChild(child._dom);
+            }
+        }
+    };
+
+    // Element constructors
+    class HTMLButtonElement extends WebSharpDOM.WebSharpElement {
+        constructor() {
+            super(document.createElement('button'), 'HTMLButtonElement');
+        }
+    }
+        </div>
+
+        <div class="demo-section">
+            <h2>🚀 Interactive Demo</h2>
+            <p>Experience the difference between the approaches:</p>
+            
+            <button class="demo-button" onclick="demonstrateCurrentApproach()">
+                🔧 Demo Current JS.Call() Approach
+            </button>
+            
+            <button class="demo-button" onclick="demonstrateProposedApproach()">
+                ✨ Demo Proposed Native DOM Approach
+            </button>
+            
+            <button class="demo-button" onclick="clearDemo()">
+                🗑️ Clear Demo
+            </button>
+            
+            <div class="output-area" id="demo-output">
+                Click a demo button to see the difference between approaches!
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🎯 The Bottom Line</h2>
+            <p>This evolution would transform WebSharp from a <span class="highlight">"C#-like language that calls JavaScript"</span> into a <span class="highlight">"true C# environment for web development"</span>. C# developers could write web applications using the exact same patterns and syntax they use for desktop applications!</p>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabId).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        function demonstrateCurrentApproach() {
+            const output = document.getElementById('demo-output');
+            output.innerHTML = `
+<span style="color: #ffc107;">🔧 Current Phase 4 Approach (JS.Call)</span>
+
+// WebSharp code using JS.Call()
+var button = JS.Call("document.createElement", "button");
+JS.Set(button, "textContent", "Current Approach Button");
+JS.Set(button, "style.backgroundColor", "#ffc107");
+JS.Set(button, "style.color", "black");
+JS.Set(button, "style.padding", "10px 20px");
+JS.Set(button, "style.border", "none");
+JS.Set(button, "style.borderRadius", "4px");
+JS.Set(button, "onclick", () => {
+    JS.Set(button, "textContent", "JS.Call() Clicked!");
+});
+JS.Call("document.body.appendChild", button);
+
+<span style="color: #dc3545;">❌ Issues:</span>
+• Verbose and repetitive
+• No IntelliSense for DOM properties
+• String-based API calls (typo-prone)
+• No compile-time type checking
+• Feels like calling into a foreign API
+
+<span style="color: #28a745;">✅ Result: Button created using low-level JS interop</span>
+            `;
+            
+            // Actually create the button using the current approach style
+            const button = document.createElement('button');
+            button.textContent = 'Current Approach Button';
+            button.style.backgroundColor = '#ffc107';
+            button.style.color = 'black';
+            button.style.padding = '10px 20px';
+            button.style.border = 'none';
+            button.style.borderRadius = '4px';
+            button.style.margin = '10px';
+            button.onclick = () => {
+                button.textContent = 'JS.Call() Clicked!';
+            };
+            document.body.appendChild(button);
+        }
+
+        function demonstrateProposedApproach() {
+            const output = document.getElementById('demo-output');
+            output.innerHTML = `
+<span style="color: #17a2b8;">✨ Proposed Phase 5 Approach (Native DOM)</span>
+
+// WebSharp code using native DOM objects
+HTMLButtonElement button = new HTMLButtonElement();
+button.TextContent = "Native DOM Button";
+button.Style.BackgroundColor = "#17a2b8";
+button.Style.Color = "white";
+button.Style.Padding = "10px 20px";
+button.Style.Border = "none";
+button.Style.BorderRadius = "4px";
+
+// Type-safe event handling
+button.Click += (sender, e) => {
+    button.TextContent = "Native DOM Clicked!";
+    button.Style.BackgroundColor = "#28a745";
+};
+
+Document.Body.AppendChild(button);
+
+<span style="color: #28a745;">✅ Benefits:</span>
+• Clean, readable C# syntax
+• Full IntelliSense support
+• Compile-time type checking
+• Familiar object-oriented approach
+• Natural event handling with +=
+
+<span style="color: #17a2b8;">🎯 Result: Button created using native C#-style objects!</span>
+            `;
+            
+            // Actually create the button using a more native style
+            const button = document.createElement('button');
+            button.textContent = 'Native DOM Button';
+            button.style.backgroundColor = '#17a2b8';
+            button.style.color = 'white';
+            button.style.padding = '10px 20px';
+            button.style.border = 'none';
+            button.style.borderRadius = '4px';
+            button.style.margin = '10px';
+            button.onclick = () => {
+                button.textContent = 'Native DOM Clicked!';
+                button.style.backgroundColor = '#28a745';
+            };
+            document.body.appendChild(button);
+        }
+
+        function clearDemo() {
+            // Remove all dynamically created buttons
+            const buttons = document.querySelectorAll('body > button');
+            buttons.forEach(button => {
+                if (button.textContent.includes('Current Approach') || 
+                    button.textContent.includes('Native DOM') ||
+                    button.textContent.includes('Clicked!')) {
+                    button.remove();
+                }
+            });
+            
+            // Reset demo output
+            document.getElementById('demo-output').innerHTML = 
+                'Click a demo button to see the difference between approaches!';
+        }
+    </script>
+</body>
+</html>
