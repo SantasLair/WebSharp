@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSharp Button Counter (Ultra Simple)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .demo-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .counter {
+            font-size: 4em;
+            font-weight: bold;
+            color: #3498db;
+            margin: 30px 0;
+        }
+        
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        
+        .btn-reset {
+            background: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>🎯 WebSharp Button Counter (Simple)</h1>
+        <p>Using ultra-simple runtime to avoid errors</p>
+        
+        <div id="counter" class="counter">0</div>
+        <button id="increment-btn" class="btn">🎯 Click Me!</button>
+        <button id="reset-btn" class="btn btn-reset">🔄 Reset</button>
+    </div>
+
+    <!-- Use simple JavaScript approach first to prove concept -->
+    <script>
+    let count = 0;
+    
+    function updateDisplay() {
+        document.getElementById('counter').textContent = count;
+        console.log('Count updated to:', count);
+    }
+    
+    function increment() {
+        count++;
+        updateDisplay();
+        console.log('Incremented to:', count);
+    }
+    
+    function reset() {
+        count = 0;
+        updateDisplay();
+        console.log('Reset to 0');
+    }
+    
+    // Add event listeners
+    document.getElementById('increment-btn').onclick = increment;
+    document.getElementById('reset-btn').onclick = reset;
+    
+    console.log('✅ JavaScript button counter initialized');
+    </script>
+    
+    <!-- Now test basic WebSharp -->
+    <script src="simple-runtime.js"></script>
+    
+    <wscript>
+Console.WriteLine("✅ WebSharp runtime is working!");
+    </wscript>
+    
+    <wscript>
+Console.WriteLine("🎯 Button counter demo loaded");
+    </wscript>
+</body>
+</html>

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSharp Button Counter v2.1 - Debug Mode</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .demo-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .counter-display {
+            font-size: 5em;
+            font-weight: bold;
+            color: #3498db;
+            margin: 30px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            transition: color 0.3s ease;
+        }
+        
+        .websharp-button {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
+            margin: 15px;
+            font-weight: bold;
+        }
+        
+        .websharp-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+        }
+        
+        .reset-button {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
+        }
+        
+        .version-badge {
+            background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        
+        .debug-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            text-align: left;
+        }
+        
+        .console-output {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 15px 0;
+            font-size: 12px;
+        }
+        
+        .success { background: #e8f5e8; border: 1px solid #4caf50; color: #2e7d32; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .failure { background: #ffebee; border: 1px solid #f44336; color: #c62828; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .debug { background: #fff3e0; border: 1px solid #ff9800; color: #e65100; padding: 10px; border-radius: 5px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <!-- WebSharp Runtime v2.1 - Enhanced Debug Mode -->
+    <script>
+    // WebSharp Compiler v2.1 - Step-by-step debugging
+    function compileWebSharpV21(source) {
+        console.log('🔧 WebSharp Compiler v2.1 - Starting compilation...');
+        console.log('📥 Original source:');
+        console.log(source);
+        
+        // Step 1: Split into lines and show each step
+        let lines = source.split('\n');
+        console.log('\n📋 Step 1 - Split into lines:');
+        lines.forEach((line, i) => console.log(`  ${i}: "${line}"`));
+        
+        // Step 2: Trim and filter empty lines
+        let trimmedLines = lines.map(line => line.trim());
+        console.log('\n✂️  Step 2 - Trimmed lines:');
+        trimmedLines.forEach((line, i) => console.log(`  ${i}: "${line}"`));
+        
+        let nonEmptyLines = trimmedLines.filter(line => line);
+        console.log('\n🚫 Step 3 - Non-empty lines:');
+        nonEmptyLines.forEach((line, i) => console.log(`  ${i}: "${line}"`));
+        
+        // Step 3: Remove comments carefully
+        let cleanedLines = [];
+        console.log('\n💬 Step 4 - Processing comments:');
+        
+        for (let line of nonEmptyLines) {
+            let original = line;
+            let commentIndex = line.indexOf('//');
+            
+            if (commentIndex >= 0) {
+                let beforeComment = line.substring(0, commentIndex);
+                let quotes = (beforeComment.match(/"/g) || []).length;
+                console.log(`    Line: "${line}"`);
+                console.log(`    Comment at: ${commentIndex}, Quotes before: ${quotes}`);
+                
+                if (quotes % 2 === 0) {
+                    line = beforeComment.trim();
+                    console.log(`    Removed comment: "${line}"`);
+                } else {
+                    console.log(`    Kept comment (inside string)`);
+                }
+            }
+            
+            if (line) {
+                cleanedLines.push(line);
+                console.log(`    Final line: "${line}"`);
+            }
+        }
+        
+        // Step 4: Join with spaces
+        let code = cleanedLines.join(' ');
+        console.log('\n🔗 Step 5 - Joined code:');
+        console.log(`"${code}"`);
+        
+        // Step 5: Apply transformations one by one with detailed logging
+        console.log('\n🔄 Step 6 - Applying transformations:');
+        
+        const transforms = [
+            { name: 'Remove public class', pattern: /public\s+class\s+(\w+)\s*\{/, replacement: 'class $1 {' },
+            { name: 'Static int field', pattern: /private\s+static\s+int\s+(\w+)\s*=\s*(\d+)\s*;/, replacement: 'static $1 = $2;' },
+            { name: 'Public static void method', pattern: /public\s+static\s+void\s+(\w+)\s*\(\s*\)\s*\{/, replacement: 'static $1() {' },
+            { name: 'Private static void method', pattern: /private\s+static\s+void\s+(\w+)\s*\(\s*\)\s*\{/, replacement: 'static $1() {' },
+            { name: 'Console.WriteLine', pattern: /Console\.WriteLine\s*\(\s*"([^"]*)"\s*\)\s*;?/, replacement: 'console.log("$1");' },
+            { name: 'var createElement', pattern: /var\s+(\w+)\s*=\s*document\.createElement\s*\(\s*"([^"]*)"\s*\)\s*;?/, replacement: 'var $1 = document.createElement("$2");' },
+            { name: 'textContent assignment', pattern: /(\w+)\.textContent\s*=\s*"([^"]*)"\s*;?/, replacement: '$1.textContent = "$2";' },
+            { name: 'className assignment', pattern: /(\w+)\.className\s*=\s*"([^"]*)"\s*;?/, replacement: '$1.className = "$2";' },
+            { name: 'id assignment', pattern: /(\w+)\.id\s*=\s*"([^"]*)"\s*;?/, replacement: '$1.id = "$2";' },
+            { name: 'appendChild', pattern: /(\w+)\.appendChild\s*\(\s*(\w+)\s*\)\s*;?/, replacement: '$1.appendChild($2);' },
+            { name: 'getElementById', pattern: /var\s+(\w+)\s*=\s*document\.getElementById\s*\(\s*"([^"]*)"\s*\)\s*;?/, replacement: 'var $1 = document.getElementById("$2");' },
+            { name: 'style.color', pattern: /(\w+)\.style\.color\s*=\s*"([^"]*)"\s*;?/, replacement: '$1.style.color = "$2";' },
+            { name: 'toString call', pattern: /(\w+)\.toString\s*\(\s*\)/, replacement: '$1.toString()' },
+            { name: 'Method calls', pattern: /(\w+)\s*\(\s*\)\s*;?/g, replacement: '$1();' }
+        ];
+        
+        for (let { name, pattern, replacement } of transforms) {
+            let before = code;
+            code = code.replace(pattern, replacement);
+            if (code !== before) {
+                console.log(`    ✅ Applied "${name}"`);
+                console.log(`    Before: "${before}"`);
+                console.log(`    After:  "${code}"`);
+            } else {
+                console.log(`    ⏸️  Skipped "${name}" (no match)`);
+            }
+        }
+        
+        console.log('\n🎯 Step 7 - Final JavaScript code:');
+        console.log(`"${code}"`);
+        
+        // Step 6: Validate syntax step by step
+        console.log('\n🧪 Step 8 - Syntax validation:');
+        
+        try {
+            // Test if it's valid JavaScript
+            new Function(code);
+            console.log('✅ JavaScript syntax is valid!');
+            return code;
+        } catch (syntaxError) {
+            console.error('❌ JavaScript syntax error:', syntaxError.message);
+            
+            // Try to identify the problematic part
+            console.log('\n🔍 Attempting to locate syntax error...');
+            
+            // Check for common issues
+            let issues = [];
+            if (code.includes('..')) issues.push('Double dots found');
+            if (code.includes('.(')) issues.push('Dot before parentheses');
+            if (code.includes('. ')) issues.push('Dot followed by space');
+            if (code.match(/\.\w+\s*\(/)) issues.push('Method call formatting');
+            
+            if (issues.length > 0) {
+                console.log('🚨 Potential issues detected:', issues.join(', '));
+            }
+            
+            throw syntaxError;
+        }
+    }
+    
+    function processWebSharpV21() {
+        const tags = document.querySelectorAll('wscript');
+        console.log(`🔍 WebSharp v2.1 - Found ${tags.length} wscript tags`);
+        
+        tags.forEach((tag, index) => {
+            const source = tag.textContent || tag.innerHTML;
+            if (!source.trim()) {
+                console.log(`⏸️  Tag ${index + 1} is empty, skipping`);
+                return;
+            }
+            
+            console.log(`\n🔧 === Processing Tag ${index + 1} ===`);
+            console.log(`📏 Source length: ${source.length} characters`);
+            
+            try {
+                const javascript = compileWebSharpV21(source);
+                
+                console.log(`\n⚡ Executing compiled JavaScript...`);
+                eval(javascript);
+                console.log(`✅ Tag ${index + 1} executed successfully!`);
+                
+                // Show success message
+                const successDiv = document.createElement('div');
+                successDiv.className = 'success';
+                successDiv.innerHTML = `✅ WebSharp Tag ${index + 1} compiled and executed successfully!`;
+                tag.parentNode.insertBefore(successDiv, tag.nextSibling);
+                
+            } catch (error) {
+                console.error(`❌ Error in tag ${index + 1}:`, error.message);
+                console.error('📍 Error stack:', error.stack);
+                
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'failure';
+                errorDiv.innerHTML = `<strong>❌ WebSharp v2.1 Error in Tag ${index + 1}:</strong><br>${error.message}<br><small>Check console for detailed debugging info</small>`;
+                tag.parentNode.insertBefore(errorDiv, tag.nextSibling);
+            }
+        });
+    }
+    
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', processWebSharpV21);
+    } else {
+        processWebSharpV21();
+    }
+    </script>
+    
+    <div class="demo-container">
+        <h1>🔧 WebSharp Button Counter</h1>
+        <div class="version-badge">📦 v2.1 - Enhanced Debug Mode</div>
+        <p>Step-by-step compilation debugging to track down the "Unexpected token '.'" error</p>
+        
+        <div id="counter-container">
+            <div class="counter-display" id="counter-display">0</div>
+        </div>
+        
+        <div id="button-container"></div>
+    </div>
+
+    <!-- WebSharp C# Code v2.1 - Simplified for debugging -->
+    <wscript>
+public class ButtonCounter {
+    private static int count = 0;
+    
+    public static void Initialize() {
+        Console.WriteLine("WebSharp v2.1 Debug - Starting Initialize");
+        
+        var incrementBtn = document.createElement("button");
+        incrementBtn.textContent = "Click Me!";
+        incrementBtn.className = "websharp-button";
+        incrementBtn.id = "increment-btn";
+        
+        var resetBtn = document.createElement("button");
+        resetBtn.textContent = "Reset";
+        resetBtn.className = "websharp-button reset-button";
+        resetBtn.id = "reset-btn";
+        
+        var container = document.getElementById("button-container");
+        container.appendChild(incrementBtn);
+        container.appendChild(resetBtn);
+        
+        UpdateDisplay();
+        Console.WriteLine("WebSharp v2.1 - Initialize completed");
+    }
+    
+    private static void UpdateDisplay() {
+        var display = document.getElementById("counter-display");
+        display.textContent = count.toString();
+        
+        if (count < 5) {
+            display.style.color = "#3498db";
+        } else {
+            display.style.color = "#e74c3c";
+        }
+    }
+}
+
+ButtonCounter.Initialize();
+    </wscript>
+
+    <!-- JavaScript Fallback v2.1 -->
+    <script>
+    setTimeout(() => {
+        const incrementBtn = document.getElementById('increment-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        
+        if (incrementBtn && resetBtn) {
+            let count = 0;
+            
+            incrementBtn.onclick = () => {
+                count++;
+                const display = document.getElementById('counter-display');
+                display.textContent = count;
+                
+                if (count < 5) {
+                    display.style.color = "#3498db";
+                } else {
+                    display.style.color = "#e74c3c";
+                }
+                
+                console.log('🎯 JavaScript fallback - Count:', count);
+            };
+            
+            resetBtn.onclick = () => {
+                count = 0;
+                const display = document.getElementById('counter-display');
+                display.textContent = "0";
+                display.style.color = "#3498db";
+                console.log('🔄 JavaScript fallback - Reset');
+            };
+            
+            console.log('✅ v2.1 JavaScript fallback active');
+            document.body.innerHTML += '<div class="success">✅ JavaScript fallback counter operational!</div>';
+        } else {
+            console.error('❌ v2.1 Buttons not found even after delay');
+            document.body.innerHTML += '<div class="failure">❌ Buttons not created by WebSharp compilation</div>';
+        }
+    }, 2000);
+    </script>
+
+    <div class="debug-panel">
+        <h2>🔍 WebSharp v2.1 Debug Console</h2>
+        <div id="console-output" class="console-output">Debug output will appear here...</div>
+        
+        <h3>🎯 Debug Features</h3>
+        <ul>
+            <li>Step-by-step source code transformation logging</li>
+            <li>Line-by-line comment removal tracking</li>
+            <li>Regex transformation detailed before/after comparison</li>
+            <li>JavaScript syntax validation with error location</li>
+            <li>Enhanced error reporting with stack traces</li>
+        </ul>
+    </div>
+
+    <script>
+    // Enhanced console capture for v2.1 debugging
+    const consoleOutput = document.getElementById('console-output');
+    const originalLog = console.log;
+    const originalError = console.error;
+    
+    console.log = function(...args) {
+        originalLog.apply(console, arguments);
+        consoleOutput.textContent += '[LOG] ' + new Date().toLocaleTimeString() + ' ' + args.join(' ') + '\n';
+        consoleOutput.scrollTop = consoleOutput.scrollHeight;
+    };
+    
+    console.error = function(...args) {
+        originalError.apply(console, arguments);
+        consoleOutput.textContent += '[ERROR] ' + new Date().toLocaleTimeString() + ' ' + args.join(' ') + '\n';
+        consoleOutput.scrollTop = consoleOutput.scrollHeight;
+    };
+    
+    console.log('🚀 WebSharp v2.1 Debug Mode - Enhanced logging active!');
+    console.log('🔍 This version will show exactly where the "Unexpected token ." error occurs');
+    </script>
+</body>
+</html>

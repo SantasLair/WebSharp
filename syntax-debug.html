@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSharp Syntax Error Debug</title>
+</head>
+<body>
+    <h1>WebSharp Syntax Error Debug</h1>
+    <div id="output"></div>
+    
+    <script src="minimal-runtime.js"></script>
+    
+    <!-- Very simple test first -->
+    <wscript>
+    Console.WriteLine("Simple test");
+    </wscript>
+    
+    <!-- Test with class -->
+    <wscript>
+    public class TestClass {
+        public static void TestMethod() {
+            Console.WriteLine("Class method test");
+        }
+    }
+    TestClass.TestMethod();
+    </wscript>
+    
+    <!-- Test with field -->
+    <wscript>
+    public class FieldTest {
+        private static int counter = 0;
+        
+        public static void ShowCounter() {
+            Console.WriteLine("Counter: " + counter);
+        }
+    }
+    FieldTest.ShowCounter();
+    </wscript>
+    
+    <script>
+    // Capture and show errors in page
+    setTimeout(() => {
+        const errors = document.querySelectorAll('[style*="ffebee"]');
+        if (errors.length > 0) {
+            console.log(`Found ${errors.length} errors in page`);
+        } else {
+            console.log("No errors displayed - check if tests passed");
+        }
+    }, 2000);
+    </script>
+</body>
+</html>

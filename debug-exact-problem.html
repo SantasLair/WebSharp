@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSharp Debug - Find the Exact Problem</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #2c3e50; color: #ecf0f1; }
+        .step { background: #34495e; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .error { background: #e74c3c; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #27ae60; padding: 10px; margin: 10px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 WebSharp Debug - Finding the Exact Problem</h1>
+    
+    <script>
+    function debugStep(stepName, code) {
+        console.log(`\n=== ${stepName} ===`);
+        console.log('Code:', code);
+        
+        try {
+            // Try to parse as JavaScript
+            new Function(code);
+            console.log('✅ VALID JavaScript');
+            document.body.innerHTML += `<div class="success">✅ ${stepName}: VALID</div>`;
+            return true;
+        } catch (error) {
+            console.log('❌ INVALID JavaScript:', error.message);
+            document.body.innerHTML += `<div class="error">❌ ${stepName}: ${error.message}</div>`;
+            return false;
+        }
+    }
+    
+    // Test 1: Simple C# class
+    const test1 = `class ButtonCounter { static count = 0; }`;
+    debugStep('Test 1 - Simple Class', test1);
+    
+    // Test 2: Method with console.log
+    const test2 = `class ButtonCounter { static Initialize() { console.log("test"); } }`;
+    debugStep('Test 2 - Method with Console', test2);
+    
+    // Test 3: DOM operation
+    const test3 = `class ButtonCounter { static Initialize() { var btn = document.createElement("button"); } }`;
+    debugStep('Test 3 - DOM Creation', test3);
+    
+    // Test 4: The actual failing pattern
+    const test4 = `class ButtonCounter { static Initialize() { var btn = document.createElement("button"); btn.textContent = "Click Me!"; } }`;
+    debugStep('Test 4 - Property Assignment', test4);
+    
+    // Test 5: Method call
+    const test5 = `class ButtonCounter { static Initialize() { ButtonCounter.UpdateDisplay(); } static UpdateDisplay() { console.log("update"); } }`;
+    debugStep('Test 5 - Method Call', test5);
+    
+    // Test 6: The problem code - let's see exactly what it becomes
+    const originalCSharp = `public class ButtonCounter {
+        private static int count = 0;
+        public static void Initialize() {
+            Console.WriteLine("test");
+        }
+    }`;
+    
+    console.log('\n=== ORIGINAL C# ===');
+    console.log(originalCSharp);
+    
+    // Simple transformation
+    let js = originalCSharp;
+    js = js.replace(/\/\/.*$/gm, ''); // Remove comments
+    js = js.replace(/\s+/g, ' ').trim(); // Normalize whitespace
+    js = js.replace(/public class (\w+) \{/, 'class $1 {');
+    js = js.replace(/private static int (\w+) = (\d+);/, 'static $1 = $2;');
+    js = js.replace(/public static void (\w+)\(\) \{/, 'static $1() {');
+    js = js.replace(/Console\.WriteLine\("([^"]*)"\);/, 'console.log("$1");');
+    
+    console.log('\n=== TRANSFORMED TO JS ===');
+    console.log(js);
+    
+    debugStep('Test 6 - Actual Transformation', js);
+    
+    </script>
+    
+    <h2>Now testing with actual wscript tag:</h2>
+    
+    <wscript>
+public class Test {
+    public static void Hello() {
+        Console.WriteLine("Hello World");
+    }
+}
+Test.Hello();
+    </wscript>
+    
+    <script>
+    // Minimal processor
+    function processDebugWebScript() {
+        const tags = document.querySelectorAll('wscript');
+        console.log('Found', tags.length, 'wscript tags');
+        
+        tags.forEach((tag, index) => {
+            const source = tag.textContent || tag.innerHTML;
+            console.log(`\nProcessing tag ${index + 1}:`);
+            console.log('Raw source:', JSON.stringify(source));
+            
+            // Clean the source
+            let js = source.replace(/\s+/g, ' ').trim();
+            console.log('Cleaned:', js);
+            
+            // Basic transformations
+            js = js.replace(/public class (\w+) \{/, 'class $1 {');
+            js = js.replace(/public static void (\w+)\(\) \{/, 'static $1() {');
+            js = js.replace(/Console\.WriteLine\("([^"]*)"\);/, 'console.log("$1");');
+            js = js.replace(/(\w+)\.Hello\(\);/, '$1.Hello();');
+            
+            console.log('Transformed:', js);
+            
+            try {
+                new Function(js);
+                console.log('✅ Syntax valid');
+                eval(js);
+                console.log('✅ Executed');
+                document.body.innerHTML += '<div class="success">✅ wscript tag worked!</div>';
+            } catch (error) {
+                console.log('❌ Error:', error.message);
+                document.body.innerHTML += `<div class="error">❌ wscript failed: ${error.message}</div>`;
+            }
+        });
+    }
+    
+    // Run the test
+    processDebugWebScript();
+    </script>
+</body>
+</html>

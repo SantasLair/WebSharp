@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSharp Button Counter (Fixed)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .demo-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .counter-display {
+            font-size: 4em;
+            font-weight: bold;
+            color: #3498db;
+            margin: 30px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .websharp-button {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            margin: 10px;
+        }
+        
+        .reset-button {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <script src="minimal-runtime.js"></script>
+    
+    <div class="demo-container">
+        <h1>🎯 WebSharp Button Counter (Fixed)</h1>
+        <p>This version avoids string interpolation to prevent syntax errors</p>
+        
+        <div id="counter-container"></div>
+    </div>
+
+    <!-- Simplified WebSharp Counter without string interpolation -->
+    <wscript>
+    public class SimpleCounter {
+        private static int count = 0;
+        
+        public static void Initialize() {
+            Console.WriteLine("Initializing simple counter...");
+            
+            var display = document.createElement("div");
+            display.className = "counter-display";
+            display.textContent = "0";
+            display.id = "counter-display";
+            
+            var clickBtn = document.createElement("button");
+            clickBtn.textContent = "🎯 Click Me!";
+            clickBtn.className = "websharp-button";
+            clickBtn.onclick = Increment;
+            
+            var resetBtn = document.createElement("button");
+            resetBtn.textContent = "🔄 Reset";
+            resetBtn.className = "websharp-button reset-button";
+            resetBtn.onclick = Reset;
+            
+            var container = document.getElementById("counter-container");
+            container.appendChild(display);
+            container.appendChild(clickBtn);
+            container.appendChild(resetBtn);
+            
+            Console.WriteLine("Counter initialized successfully!");
+        }
+        
+        private static void Increment() {
+            count++;
+            UpdateDisplay();
+            Console.WriteLine("Count incremented to: " + count);
+        }
+        
+        private static void Reset() {
+            count = 0;
+            UpdateDisplay();
+            Console.WriteLine("Counter reset to 0");
+        }
+        
+        private static void UpdateDisplay() {
+            var display = document.getElementById("counter-display");
+            display.textContent = count.toString();
+            
+            if (count < 5) {
+                display.style.color = "#3498db";
+            } else if (count < 10) {
+                display.style.color = "#f39c12";
+            } else {
+                display.style.color = "#e74c3c";
+            }
+        }
+    }
+    
+    SimpleCounter.Initialize();
+    </wscript>
+</body>
+</html>

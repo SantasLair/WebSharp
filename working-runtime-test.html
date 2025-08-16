@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head><title>Working Runtime Test</title></head>
+<body>
+    <h1>Working Runtime Test</h1>
+    
+    <script src="working-runtime.js"></script>
+    
+    <!-- Test basic console -->
+    <wscript>
+Console.WriteLine("Test 1: Basic console");
+    </wscript>
+    
+    <!-- Test simple class -->
+    <wscript>
+public class TestClass {
+    public static void Test() {
+        Console.WriteLine("Test 2: Class method");
+    }
+}
+TestClass.Test();
+    </wscript>
+    
+    <!-- Test DOM manipulation -->
+    <wscript>
+var element = document.createElement("div");
+element.textContent = "Test 3: DOM element";
+element.className = "test-element";
+document.body.appendChild(element);
+Console.WriteLine("Test 3: DOM manipulation complete");
+    </wscript>
+    
+    <script>
+    // Track actual WebSharp execution
+    let websharpTestResults = {
+        test1: false,
+        test2: false, 
+        test3: false
+    };
+    
+    // Override console.log to track WebSharp output
+    const originalConsoleLog = console.log;
+    console.log = function(...args) {
+        originalConsoleLog.apply(console, arguments);
+        
+        const message = args.join(' ');
+        if (message.includes('Test 1: Basic console')) {
+            websharpTestResults.test1 = true;
+        }
+        if (message.includes('Test 2: Class method')) {
+            websharpTestResults.test2 = true;
+        }
+        if (message.includes('Test 3: DOM manipulation complete')) {
+            websharpTestResults.test3 = true;
+        }
+    };
+    
+    setTimeout(() => {
+        const errors = document.querySelectorAll('[style*="ffebee"]');
+        const testElements = document.querySelectorAll('.test-element');
+        
+        // Check if runtime loaded
+        const runtimeLoaded = typeof processWebScriptTagsWorking !== 'undefined';
+        
+        // Verify actual test results
+        const testsExecuted = websharpTestResults.test1 && websharpTestResults.test2 && websharpTestResults.test3;
+        const domElementCreated = testElements.length > 0;
+        
+        let statusHTML = '<div style="background: #f8f9fa; padding: 20px; margin: 20px 0; border: 2px solid #dee2e6; border-radius: 5px;">';
+        statusHTML += '<h3>🔍 Detailed Test Results:</h3>';
+        statusHTML += `<p><strong>Runtime Loaded:</strong> ${runtimeLoaded ? '✅ Yes' : '❌ No'}</p>`;
+        statusHTML += `<p><strong>Errors Found:</strong> ${errors.length === 0 ? '✅ None' : `❌ ${errors.length} errors`}</p>`;
+        statusHTML += `<p><strong>Test 1 (Console):</strong> ${websharpTestResults.test1 ? '✅ Passed' : '❌ Failed'}</p>`;
+        statusHTML += `<p><strong>Test 2 (Class):</strong> ${websharpTestResults.test2 ? '✅ Passed' : '❌ Failed'}</p>`;
+        statusHTML += `<p><strong>Test 3 (DOM):</strong> ${websharpTestResults.test3 ? '✅ Passed' : '❌ Failed'}</p>`;
+        statusHTML += `<p><strong>DOM Element Created:</strong> ${domElementCreated ? '✅ Yes' : '❌ No'}</p>`;
+        statusHTML += '</div>';
+        
+        if (runtimeLoaded && errors.length === 0 && testsExecuted && domElementCreated) {
+            statusHTML += '<div style="background: #e8f5e8; padding: 15px; margin: 10px 0; border: 2px solid #4caf50; border-radius: 5px;"><strong>🎉 ALL TESTS GENUINELY PASSED!</strong><br>WebSharp runtime is working correctly.</div>';
+        } else {
+            statusHTML += '<div style="background: #ffebee; padding: 15px; margin: 10px 0; border: 2px solid #f44336; border-radius: 5px;"><strong>❌ TESTS FAILED!</strong><br>';
+            if (!runtimeLoaded) statusHTML += '• Runtime not loaded<br>';
+            if (errors.length > 0) statusHTML += `• ${errors.length} compilation errors<br>`;
+            if (!testsExecuted) statusHTML += '• WebSharp code did not execute<br>';
+            if (!domElementCreated) statusHTML += '• DOM manipulation failed<br>';
+            statusHTML += '</div>';
+        }
+        
+        document.body.innerHTML += statusHTML;
+    }, 2000);
+    </script>
+</body>
+</html>

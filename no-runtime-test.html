@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head><title>No Runtime Test (Should Fail)</title></head>
+<body>
+    <h1>No Runtime Test - This Should Show Failure</h1>
+    <p>This page intentionally does NOT include the WebSharp runtime to test proper failure detection.</p>
+    
+    <!-- NO runtime included -->
+    <!-- <script src="working-runtime.js"></script> -->
+    
+    <wscript>
+Console.WriteLine("This should NOT execute");
+    </wscript>
+    
+    <wscript>
+public class TestClass {
+    public static void Test() {
+        Console.WriteLine("This should also NOT execute");
+    }
+}
+TestClass.Test();
+    </wscript>
+    
+    <script>
+    // Track WebSharp execution attempts
+    let websharpOutputDetected = false;
+    
+    const originalConsoleLog = console.log;
+    console.log = function(...args) {
+        originalConsoleLog.apply(console, arguments);
+        const message = args.join(' ');
+        if (message.includes('This should NOT execute') || message.includes('This should also NOT execute')) {
+            websharpOutputDetected = true;
+        }
+    };
+    
+    setTimeout(() => {
+        const wscriptTags = document.querySelectorAll('wscript');
+        const runtimeLoaded = typeof processWebScriptTagsWorking !== 'undefined';
+        const errors = document.querySelectorAll('[style*="ffebee"]');
+        
+        let statusHTML = '<div style="background: #f8f9fa; padding: 20px; margin: 20px 0; border: 2px solid #dee2e6; border-radius: 5px;">';
+        statusHTML += '<h3>🔍 Test Results (Should Show Failure):</h3>';
+        statusHTML += `<p><strong>Runtime Loaded:</strong> ${runtimeLoaded ? '❌ Unexpectedly Yes' : '✅ Correctly No'}</p>`;
+        statusHTML += `<p><strong>WebScript Tags Found:</strong> ${wscriptTags.length}</p>`;
+        statusHTML += `<p><strong>WebSharp Code Executed:</strong> ${websharpOutputDetected ? '❌ Unexpectedly Yes' : '✅ Correctly No'}</p>`;
+        statusHTML += `<p><strong>Error Divs:</strong> ${errors.length}</p>`;
+        statusHTML += '</div>';
+        
+        if (!runtimeLoaded && !websharpOutputDetected) {
+            statusHTML += '<div style="background: #e8f5e8; padding: 15px; margin: 10px 0; border: 2px solid #4caf50; border-radius: 5px;"><strong>✅ CORRECT BEHAVIOR!</strong><br>No runtime = No WebSharp execution (as expected)</div>';
+        } else {
+            statusHTML += '<div style="background: #ffebee; padding: 15px; margin: 10px 0; border: 2px solid #f44336; border-radius: 5px;"><strong>❌ UNEXPECTED BEHAVIOR!</strong><br>WebSharp code executed without runtime</div>';
+        }
+        
+        document.body.innerHTML += statusHTML;
+    }, 2000);
+    </script>
+</body>
+</html>

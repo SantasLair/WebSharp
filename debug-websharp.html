@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSharp Debug Test</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #2c3e50; color: #ecf0f1; }
+        .debug { background: #34495e; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .error { background: #e74c3c; color: white; padding: 10px; border-radius: 5px; }
+        .success { background: #27ae60; color: white; padding: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🔧 WebSharp Compilation Debug</h1>
+    
+    <script>
+    // Simplified debug compiler
+    function debugCompileWebSharp(source) {
+        console.log('=== DEBUG COMPILATION START ===');
+        let js = source.trim();
+        
+        console.log('Step 0 - Original:', js);
+        
+        try {
+            // Step 1: Remove comments more aggressively
+            js = js.replace(/\/\/.*$/gm, '');
+            console.log('Step 1 - Comments removed:', js);
+            
+            // Step 2: Normalize whitespace
+            js = js.replace(/\s+/g, ' ').trim();
+            console.log('Step 2 - Whitespace normalized:', js);
+            
+            // Step 3: Basic replacements
+            js = js.replace(/Console\.WriteLine\s*\(\s*"([^"]*)"\s*\)/g, 'console.log("$1")');
+            js = js.replace(/public\s+class\s+(\w+)\s*\{/g, 'class $1 {');
+            js = js.replace(/public\s+static\s+void\s+(\w+)\s*\(\s*\)\s*\{/g, 'static $1() {');
+            js = js.replace(/private\s+static\s+int\s+(\w+)\s*=\s*(\d+)\s*;/g, 'static $1 = $2;');
+            
+            console.log('Step 3 - Basic replacements:', js);
+            
+            // Try to validate JavaScript syntax
+            console.log('Step 4 - Validating syntax...');
+            new Function(js);
+            console.log('✅ Syntax validation PASSED');
+            
+            return js;
+            
+        } catch (error) {
+            console.error('❌ Compilation failed at:', error.message);
+            console.error('❌ Problematic code:', js);
+            throw error;
+        }
+    }
+    
+    // Test with simple WebSharp code
+    const testCode = `
+public class Test {
+    private static int count = 0;
+    public static void Initialize() {
+        Console.WriteLine("Hello World");
+    }
+}
+Test.Initialize();
+    `;
+    
+    try {
+        const result = debugCompileWebSharp(testCode);
+        document.body.innerHTML += '<div class="success">✅ Simple test PASSED</div>';
+        document.body.innerHTML += '<div class="debug">Result: ' + result + '</div>';
+    } catch (error) {
+        document.body.innerHTML += '<div class="error">❌ Simple test FAILED: ' + error.message + '</div>';
+    }
+    </script>
+    
+    <h2>Testing Simple WebSharp Code</h2>
+    <wscript>
+public class SimpleTest {
+    private static int number = 42;
+    
+    public static void TestMethod() {
+        Console.WriteLine("WebSharp is working!");
+    }
+}
+
+SimpleTest.TestMethod();
+    </wscript>
+    
+    <script>
+    // Minimal runtime for testing
+    function processWebScriptTags() {
+        const tags = document.querySelectorAll('wscript');
+        console.log('Found', tags.length, 'wscript tags');
+        
+        tags.forEach((tag, index) => {
+            const source = tag.textContent || tag.innerHTML;
+            console.log(`Processing tag ${index + 1}:`, source);
+            
+            try {
+                const js = debugCompileWebSharp(source);
+                console.log('Compiled to:', js);
+                
+                const func = new Function(js);
+                func();
+                
+                document.body.innerHTML += '<div class="success">✅ Tag ' + (index + 1) + ' executed successfully</div>';
+                
+            } catch (error) {
+                console.error('Error in tag', index + 1, ':', error);
+                document.body.innerHTML += '<div class="error">❌ Tag ' + (index + 1) + ' failed: ' + error.message + '</div>';
+            }
+        });
+    }
+    
+    // Run after page loads
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', processWebScriptTags);
+    } else {
+        processWebScriptTags();
+    }
+    </script>
+</body>
+</html>

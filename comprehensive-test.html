@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSharp Test Suite - Comprehensive Verification</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .test-section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        
+        .success { background: #e8f5e8; border: 2px solid #4caf50; color: #2e7d32; }
+        .failure { background: #ffebee; border: 2px solid #f44336; color: #c62828; }
+        .info { background: #e3f2fd; border: 2px solid #2196f3; color: #1565c0; }
+        
+        .verification-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .verification-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+            overflow-x: auto;
+        }
+        
+        .websharp-output {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 WebSharp Test Suite - Comprehensive Verification</h1>
+    <p>This test suite verifies that WebSharp runtime detection and execution work correctly.</p>
+    
+    <!-- Include the working runtime -->
+    <script src="working-runtime.js"></script>
+    
+    <div class="test-section">
+        <h2>🎯 Test 1: Basic Console Output</h2>
+        <p>Testing simple Console.WriteLine functionality:</p>
+        
+        <wscript>
+Console.WriteLine("🎉 Test 1 Success: Basic console output working");
+        </wscript>
+        
+        <div id="test1-output" class="websharp-output">WebSharp output will appear here...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🏗️ Test 2: Class and Method Declaration</h2>
+        <p>Testing C# class syntax with static methods:</p>
+        
+        <wscript>
+public class TestRunner {
+    public static void ExecuteTest() {
+        Console.WriteLine("🎉 Test 2 Success: Class and method declarations working");
+    }
+}
+TestRunner.ExecuteTest();
+        </wscript>
+        
+        <div id="test2-output" class="websharp-output">WebSharp output will appear here...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🌐 Test 3: DOM Manipulation</h2>
+        <p>Testing DOM element creation and manipulation:</p>
+        
+        <wscript>
+var testDiv = document.createElement("div");
+testDiv.textContent = "🎉 Test 3 Success: DOM manipulation working";
+testDiv.className = "dom-test-element";
+testDiv.id = "dom-test-result";
+document.body.appendChild(testDiv);
+Console.WriteLine("🎉 Test 3 Success: DOM element created and added");
+        </wscript>
+        
+        <div id="test3-output" class="websharp-output">WebSharp output will appear here...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🔧 Test 4: Static Fields and State</h2>
+        <p>Testing static field declarations and state management:</p>
+        
+        <wscript>
+public class Counter {
+    private static int value = 42;
+    
+    public static void ShowValue() {
+        Console.WriteLine("🎉 Test 4 Success: Static field value = " + value);
+    }
+}
+Counter.ShowValue();
+        </wscript>
+        
+        <div id="test4-output" class="websharp-output">WebSharp output will appear here...</div>
+    </div>
+    
+    <!-- Test Results Section -->
+    <div class="test-section">
+        <h2>📊 Test Results</h2>
+        <div id="results-container">
+            <div class="info">🔄 Running tests... Please wait for results.</div>
+        </div>
+    </div>
+    
+    <script>
+    // Comprehensive test tracking
+    const testTracker = {
+        test1: false,
+        test2: false,
+        test3: false,
+        test4: false,
+        outputs: []
+    };
+    
+    // Capture console output
+    const originalConsoleLog = console.log;
+    console.log = function(...args) {
+        originalConsoleLog.apply(console, arguments);
+        
+        const message = args.join(' ');
+        testTracker.outputs.push(message);
+        
+        // Track specific test completions
+        if (message.includes('Test 1 Success')) testTracker.test1 = true;
+        if (message.includes('Test 2 Success')) testTracker.test2 = true;
+        if (message.includes('Test 3 Success')) testTracker.test3 = true;
+        if (message.includes('Test 4 Success')) testTracker.test4 = true;
+        
+        // Update output divs
+        if (message.includes('Test 1')) {
+            document.getElementById('test1-output').textContent = message;
+        }
+        if (message.includes('Test 2')) {
+            document.getElementById('test2-output').textContent = message;
+        }
+        if (message.includes('Test 3')) {
+            document.getElementById('test3-output').textContent = message;
+        }
+        if (message.includes('Test 4')) {
+            document.getElementById('test4-output').textContent = message;
+        }
+    };
+    
+    // Comprehensive results after delay
+    setTimeout(() => {
+        const resultsContainer = document.getElementById('results-container');
+        
+        // Check runtime availability
+        const runtimeLoaded = typeof processWebScriptTagsWorking !== 'undefined';
+        
+        // Check for errors
+        const errorDivs = document.querySelectorAll('[style*="ffebee"]');
+        
+        // Check DOM manipulation result
+        const domTestElement = document.getElementById('dom-test-result');
+        const domTestSuccess = domTestElement !== null;
+        
+        // Count WebScript tags
+        const wscriptTags = document.querySelectorAll('wscript');
+        
+        // Calculate overall success
+        const allTestsPassed = testTracker.test1 && testTracker.test2 && testTracker.test3 && testTracker.test4;
+        const noErrors = errorDivs.length === 0;
+        const overallSuccess = runtimeLoaded && allTestsPassed && noErrors && domTestSuccess;
+        
+        let resultsHTML = '<div class="verification-grid">';
+        
+        resultsHTML += `<div class="verification-item">
+            <h4>🔧 Runtime Status</h4>
+            <p><strong>Loaded:</strong> ${runtimeLoaded ? '✅ Yes' : '❌ No'}</p>
+            <p><strong>Function:</strong> ${typeof processWebScriptTagsWorking}</p>
+        </div>`;
+        
+        resultsHTML += `<div class="verification-item">
+            <h4>📝 WebScript Tags</h4>
+            <p><strong>Found:</strong> ${wscriptTags.length}</p>
+            <p><strong>Expected:</strong> 4</p>
+        </div>`;
+        
+        resultsHTML += `<div class="verification-item">
+            <h4>🧪 Test Execution</h4>
+            <p><strong>Test 1:</strong> ${testTracker.test1 ? '✅' : '❌'}</p>
+            <p><strong>Test 2:</strong> ${testTracker.test2 ? '✅' : '❌'}</p>
+            <p><strong>Test 3:</strong> ${testTracker.test3 ? '✅' : '❌'}</p>
+            <p><strong>Test 4:</strong> ${testTracker.test4 ? '✅' : '❌'}</p>
+        </div>`;
+        
+        resultsHTML += `<div class="verification-item">
+            <h4>🌐 DOM Results</h4>
+            <p><strong>Element Created:</strong> ${domTestSuccess ? '✅ Yes' : '❌ No'}</p>
+            <p><strong>Errors:</strong> ${errorDivs.length}</p>
+        </div>`;
+        
+        resultsHTML += '</div>';
+        
+        if (overallSuccess) {
+            resultsHTML += '<div class="status success">🎉 ALL TESTS PASSED SUCCESSFULLY!<br>WebSharp runtime is working perfectly.</div>';
+        } else {
+            resultsHTML += '<div class="status failure">❌ TESTS FAILED:<br>';
+            if (!runtimeLoaded) resultsHTML += '• Runtime not loaded properly<br>';
+            if (!allTestsPassed) resultsHTML += '• Some WebSharp code did not execute<br>';
+            if (errorDivs.length > 0) resultsHTML += `• ${errorDivs.length} compilation errors found<br>`;
+            if (!domTestSuccess) resultsHTML += '• DOM manipulation failed<br>';
+            resultsHTML += '</div>';
+        }
+        
+        // Show console output
+        resultsHTML += '<div style="margin-top: 20px;"><h4>📋 Console Output:</h4><pre>' + testTracker.outputs.join('\\n') + '</pre></div>';
+        
+        resultsContainer.innerHTML = resultsHTML;
+        
+    }, 3000);
+    </script>
+</body>
+</html>

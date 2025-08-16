@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head><title>Minimal WebSharp Test</title></head>
+<body>
+    <h1>Minimal WebSharp Test</h1>
+    
+    <script src="minimal-runtime.js"></script>
+    
+    <!-- Test the simplest possible WebSharp code -->
+    <wscript>
+console.log("Direct JavaScript test");
+    </wscript>
+    
+    <!-- Test Console.WriteLine -->
+    <wscript>
+Console.WriteLine("Hello");
+    </wscript>
+    
+    <!-- Test basic transformation -->
+    <wscript>
+var element = document.createElement("div");
+element.textContent = "Basic test";
+document.body.appendChild(element);
+    </wscript>
+    
+    <script>
+    setTimeout(() => {
+        console.log("=== Test Results ===");
+        const errors = document.querySelectorAll('[style*="ffebee"]');
+        console.log(`Errors found: ${errors.length}`);
+        
+        if (window.lastWebSharpCompilation) {
+            console.log("Last compilation:", window.lastWebSharpCompilation);
+        }
+    }, 1000);
+    </script>
+</body>
+</html>

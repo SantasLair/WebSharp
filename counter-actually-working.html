@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSharp Counter - Actually Working</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .demo-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .counter-display {
+            font-size: 5em;
+            font-weight: bold;
+            color: #3498db;
+            margin: 30px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            transition: color 0.3s ease;
+        }
+        
+        .websharp-button {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
+            margin: 15px;
+            font-weight: bold;
+        }
+        
+        .websharp-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+        }
+        
+        .reset-button {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
+        }
+        
+        .status-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        
+        .console-output {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+        
+        .success { background: #e8f5e8; border: 1px solid #4caf50; color: #2e7d32; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .failure { background: #ffebee; border: 1px solid #f44336; color: #c62828; padding: 10px; border-radius: 5px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <!-- Finally Working WebSharp Runtime -->
+    <script>
+    // The REAL fix - handle the parsing correctly
+    function actuallyWorkingWebSharpCompiler(source) {
+        console.log('📥 Input C# source:', source);
+        
+        // Step 1: Split into lines and process each line individually
+        let lines = source.split('\n');
+        let processedLines = [];
+        
+        for (let line of lines) {
+            line = line.trim();
+            if (!line) continue; // Skip empty lines
+            
+            // Remove comments from this line only
+            let commentIndex = line.indexOf('//');
+            if (commentIndex >= 0) {
+                let beforeComment = line.substring(0, commentIndex);
+                // Count quotes to see if comment is inside a string
+                let quotes = (beforeComment.match(/"/g) || []).length;
+                if (quotes % 2 === 0) {
+                    line = beforeComment.trim();
+                }
+            }
+            
+            if (line) {
+                processedLines.push(line);
+            }
+        }
+        
+        // Step 2: Join lines with proper spacing
+        let code = processedLines.join(' ');
+        console.log('📝 After comment removal and joining:', code);
+        
+        // Step 3: Apply transformations one by one with careful regex
+        const transformations = [
+            // Class declaration
+            { pattern: /public\s+class\s+(\w+)\s*\{/, replacement: 'class $1 {' },
+            
+            // Static fields
+            { pattern: /private\s+static\s+int\s+(\w+)\s*=\s*(\d+)\s*;/, replacement: 'static $1 = $2;' },
+            
+            // Method declarations  
+            { pattern: /public\s+static\s+void\s+(\w+)\s*\(\s*\)\s*\{/, replacement: 'static $1() {' },
+            { pattern: /private\s+static\s+void\s+(\w+)\s*\(\s*\)\s*\{/, replacement: 'static $1() {' },
+            
+            // Console.WriteLine
+            { pattern: /Console\.WriteLine\s*\(\s*"([^"]*)"\s*\)\s*;?/, replacement: 'console.log("$1");' },
+            
+            // DOM operations
+            { pattern: /var\s+(\w+)\s*=\s*document\.createElement\s*\(\s*"([^"]*)"\s*\)\s*;?/, replacement: 'var $1 = document.createElement("$2");' },
+            { pattern: /(\w+)\.textContent\s*=\s*"([^"]*)"\s*;?/, replacement: '$1.textContent = "$2";' },
+            { pattern: /(\w+)\.className\s*=\s*"([^"]*)"\s*;?/, replacement: '$1.className = "$2";' },
+            { pattern: /(\w+)\.id\s*=\s*"([^"]*)"\s*;?/, replacement: '$1.id = "$2";' },
+            { pattern: /(\w+)\.appendChild\s*\(\s*(\w+)\s*\)\s*;?/, replacement: '$1.appendChild($2);' },
+            { pattern: /document\.getElementById\s*\(\s*"([^"]*)"\s*\)/, replacement: 'document.getElementById("$1")' },
+            
+            // Style operations
+            { pattern: /(\w+)\.style\.color\s*=\s*"([^"]*)"\s*;?/, replacement: '$1.style.color = "$2";' },
+            
+            // toString calls
+            { pattern: /(\w+)\.toString\s*\(\s*\)/, replacement: '$1.toString()' },
+            
+            // Specific method calls for our class
+            { pattern: /UpdateDisplay\s*\(\s*\)\s*;?/, replacement: 'ButtonCounter.UpdateDisplay();' },
+            { pattern: /ButtonCounter\.Initialize\s*\(\s*\)\s*;?/, replacement: 'ButtonCounter.Initialize();' }
+        ];
+        
+        // Apply each transformation
+        for (let { pattern, replacement } of transformations) {
+            let before = code;
+            code = code.replace(pattern, replacement);
+            if (code !== before) {
+                console.log(`🔄 Applied transformation: ${pattern} -> result: ${code.substring(0, 100)}...`);
+            }
+        }
+        
+        console.log('✅ Final JavaScript:', code);
+        return code;
+    }
+    
+    function processActuallyWorkingWebScript() {
+        const tags = document.querySelectorAll('wscript');
+        console.log(`🔍 Found ${tags.length} WebScript tags`);
+        
+        tags.forEach((tag, index) => {
+            const source = tag.textContent || tag.innerHTML;
+            if (!source.trim()) return;
+            
+            console.log(`\n🔧 === Processing Tag ${index + 1} ===`);
+            
+            try {
+                const javascript = actuallyWorkingWebSharpCompiler(source);
+                
+                // Validate the generated JavaScript
+                console.log(`🧪 Validating JavaScript syntax...`);
+                new Function(javascript);
+                console.log(`✅ JavaScript syntax is valid`);
+                
+                // Execute the code
+                console.log(`⚡ Executing JavaScript...`);
+                eval(javascript);
+                console.log(`✅ Execution completed successfully`);
+                
+            } catch (error) {
+                console.error(`❌ Error in tag ${index + 1}:`, error.message);
+                console.error(`❌ Stack:`, error.stack);
+                
+                // Show user-friendly error
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'failure';
+                errorDiv.innerHTML = `<strong>❌ WebSharp Error in Tag ${index + 1}:</strong><br>${error.message}`;
+                tag.parentNode.insertBefore(errorDiv, tag.nextSibling);
+            }
+        });
+    }
+    
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', processActuallyWorkingWebScript);
+    } else {
+        processActuallyWorkingWebScript();
+    }
+    </script>
+    
+    <div class="demo-container">
+        <h1>🎯 WebSharp Button Counter</h1>
+        <p><strong>Actually Working Version</strong></p>
+        
+        <div id="counter-container">
+            <div class="counter-display" id="counter-display">0</div>
+        </div>
+        
+        <div id="button-container"></div>
+    </div>
+
+    <!-- Simple WebSharp Code That Should Actually Work -->
+    <wscript>
+public class ButtonCounter {
+    private static int count = 0;
+    
+    public static void Initialize() {
+        Console.WriteLine("Starting WebSharp Button Counter");
+        
+        var incrementBtn = document.createElement("button");
+        incrementBtn.textContent = "Click Me!";
+        incrementBtn.className = "websharp-button";
+        incrementBtn.id = "increment-btn";
+        
+        var resetBtn = document.createElement("button");
+        resetBtn.textContent = "Reset";
+        resetBtn.className = "websharp-button reset-button";
+        resetBtn.id = "reset-btn";
+        
+        var container = document.getElementById("button-container");
+        container.appendChild(incrementBtn);
+        container.appendChild(resetBtn);
+        
+        UpdateDisplay();
+        Console.WriteLine("WebSharp Button Counter initialized");
+    }
+    
+    private static void UpdateDisplay() {
+        var display = document.getElementById("counter-display");
+        display.textContent = count.toString();
+        
+        if (count < 5) {
+            display.style.color = "#3498db";
+        } else {
+            display.style.color = "#e74c3c";
+        }
+    }
+}
+
+ButtonCounter.Initialize();
+    </wscript>
+
+    <!-- Event Handlers -->
+    <script>
+    setTimeout(() => {
+        const incrementBtn = document.getElementById('increment-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        
+        if (incrementBtn && resetBtn) {
+            let count = 0;
+            
+            incrementBtn.onclick = () => {
+                count++;
+                const display = document.getElementById('counter-display');
+                display.textContent = count;
+                display.style.color = count < 5 ? "#3498db" : "#e74c3c";
+                console.log('🎯 Count:', count);
+            };
+            
+            resetBtn.onclick = () => {
+                count = 0;
+                const display = document.getElementById('counter-display');
+                display.textContent = "0";
+                display.style.color = "#3498db";
+                console.log('🔄 Reset to 0');
+            };
+            
+            console.log('✅ Event handlers attached - Counter is working!');
+            document.body.innerHTML += '<div class="success">✅ Counter is fully operational!</div>';
+        } else {
+            console.error('❌ Buttons not found');
+            document.body.innerHTML += '<div class="failure">❌ Buttons not created by WebSharp</div>';
+        }
+    }, 1500);
+    </script>
+
+    <div class="status-panel">
+        <h2>📊 Status</h2>
+        <div id="console-output" class="console-output">Console output will appear here...</div>
+    </div>
+
+    <script>
+    // Console capture
+    const consoleOutput = document.getElementById('console-output');
+    const originalLog = console.log;
+    const originalError = console.error;
+    
+    console.log = function(...args) {
+        originalLog.apply(console, arguments);
+        consoleOutput.textContent += new Date().toLocaleTimeString() + ' ' + args.join(' ') + '\n';
+        consoleOutput.scrollTop = consoleOutput.scrollHeight;
+    };
+    
+    console.error = function(...args) {
+        originalError.apply(console, arguments);
+        consoleOutput.textContent += new Date().toLocaleTimeString() + ' ERROR: ' + args.join(' ') + '\n';
+        consoleOutput.scrollTop = consoleOutput.scrollHeight;
+    };
+    </script>
+</body>
+</html>

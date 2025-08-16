@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head><title>Simple Runtime Test</title></head>
+<body>
+    <h1>Simple Runtime Test</h1>
+    
+    <script src="simple-runtime.js"></script>
+    
+    <!-- Test 1: Console only -->
+    <wscript>
+Console.WriteLine("Hello World");
+    </wscript>
+    
+    <!-- Test 2: Variable -->
+    <wscript>
+Console.WriteLine("Test 2");
+    </wscript>
+    
+    <script>
+    // Track actual WebSharp execution
+    let websharpExecutionCount = 0;
+    
+    const originalConsoleLog = console.log;
+    console.log = function(...args) {
+        originalConsoleLog.apply(console, arguments);
+        const message = args.join(' ');
+        if (message.includes('Hello World') || message.includes('Test 2')) {
+            websharpExecutionCount++;
+        }
+    };
+    
+    setTimeout(() => {
+        const errors = document.querySelectorAll('[style*="ffebee"]');
+        const wscriptTags = document.querySelectorAll('wscript');
+        const runtimeLoaded = typeof processWebScriptTagsSimple !== 'undefined';
+        
+        let statusHTML = '<div style="background: #f8f9fa; padding: 15px; margin: 15px 0; border: 2px solid #dee2e6; border-radius: 5px;">';
+        statusHTML += '<h3>🔍 Verification Results:</h3>';
+        statusHTML += `<p><strong>Simple Runtime Loaded:</strong> ${runtimeLoaded ? '✅ Yes' : '❌ No'}</p>`;
+        statusHTML += `<p><strong>WebScript Tags Found:</strong> ${wscriptTags.length}</p>`;
+        statusHTML += `<p><strong>WebSharp Executions:</strong> ${websharpExecutionCount}</p>`;
+        statusHTML += `<p><strong>Error Divs:</strong> ${errors.length}</p>`;
+        statusHTML += '</div>';
+        
+        if (runtimeLoaded && errors.length === 0 && websharpExecutionCount >= 2) {
+            statusHTML += '<div style="background: #e8f5e8; padding: 10px; margin: 10px 0; border: 2px solid #4caf50; border-radius: 5px;"><strong>✅ All tests GENUINELY passed!</strong></div>';
+        } else {
+            statusHTML += '<div style="background: #ffebee; padding: 10px; margin: 10px 0; border: 2px solid #f44336; border-radius: 5px;"><strong>❌ Tests failed:</strong><br>';
+            if (!runtimeLoaded) statusHTML += '• Runtime not loaded<br>';
+            if (errors.length > 0) statusHTML += `• ${errors.length} errors found<br>`;
+            if (websharpExecutionCount < 2) statusHTML += '• WebSharp code did not execute properly<br>';
+            statusHTML += '</div>';
+        }
+        
+        document.body.innerHTML += statusHTML;
+    }, 1000);
+    </script>
+</body>
+</html>
