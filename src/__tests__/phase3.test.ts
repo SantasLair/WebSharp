@@ -118,10 +118,8 @@ describe('Phase 3: JavaScript Code Generation', () => {
       });
 
       try {
-        // Execute the generated JavaScript
-        eval(javascript);
-        // Call the Main method
-        eval('App.Main()');
+        // Execute the generated JavaScript and call the Main method in one eval
+        eval(javascript + '\nApp.Main();');
         
         expect(consoleLogs).toContain('Hello, Web#!');
       } finally {

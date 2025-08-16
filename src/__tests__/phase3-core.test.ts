@@ -55,10 +55,8 @@ describe('Phase 3: JavaScript Code Generation (Core)', () => {
       });
 
       try {
-        // Execute the generated JavaScript
-        eval(javascript);
-        // Call the Main method
-        eval('App.Main()');
+        // Execute the generated JavaScript and call the Main method in one eval
+        eval(javascript + '\nApp.Main();');
         
         // Verify output
         expect(consoleLogs).toContain('Hello, Web#!');
@@ -153,8 +151,7 @@ describe('Phase 3: JavaScript Code Generation (Core)', () => {
       });
 
       try {
-        eval(javascript);
-        eval('Demo.Run()');
+        eval(javascript + '\nDemo.Run();');
         expect(consoleLogs).toContain('Phase 3 Success!');
       } finally {
         console.log = originalLog;

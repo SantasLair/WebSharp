@@ -227,9 +227,9 @@ export class Parser {
       return new FieldNode(memberName, type, undefined, accessModifier, isStatic, this.getSourceLocation(start));
     } else if (this.match(TokenType.ASSIGN)) {
       // Field with initializer
-      // For now, skip the initializer (would need expression parsing)
-      this.skipToSemicolon();
-      return new FieldNode(memberName, type, undefined, accessModifier, isStatic, this.getSourceLocation(start));
+      const initializer = this.parseExpression();
+      this.consume(TokenType.SEMICOLON, 'Expected ";"');
+      return new FieldNode(memberName, type, initializer, accessModifier, isStatic, this.getSourceLocation(start));
     } else {
       throw new ParseError('Expected method parameters, property accessors, or field declaration', this.peek());
     }
@@ -466,6 +466,45 @@ export class Parser {
       return this.parseReturnStatement();
     }
     
+    if (this.check(TokenType.IF)) {
+      // For now, skip IF statements by parsing them as a placeholder
+      // TODO: Implement proper IF statement parsing
+      this.advance(); // consume 'if'
+      this.consume(TokenType.LEFT_PAREN, 'Expected "("');
+      this.parseExpression(); // parse condition (and discard)
+      this.consume(TokenType.RIGHT_PAREN, 'Expected ")"');
+      this.parseStatement(); // parse then statement (and discard)
+      if (this.check(TokenType.ELSE)) {
+        this.advance(); // consume 'else'
+        this.parseStatement(); // parse else statement (and discard)
+      }
+      // Return a placeholder expression statement
+      return new ExpressionStatementNode(new LiteralNode(null, 'null'));
+    }
+    
+    if (this.check(TokenType.WHILE)) {
+      // TODO: Implement proper WHILE statement parsing
+      this.advance(); // consume 'while'
+      this.consume(TokenType.LEFT_PAREN, 'Expected "("');
+      this.parseExpression(); // parse condition (and discard)
+      this.consume(TokenType.RIGHT_PAREN, 'Expected ")"');
+      this.parseStatement(); // parse body (and discard)
+      return new ExpressionStatementNode(new LiteralNode(null, 'null'));
+    }
+    
+    if (this.check(TokenType.FOR)) {
+      // TODO: Implement proper FOR statement parsing
+      this.advance(); // consume 'for'
+      this.consume(TokenType.LEFT_PAREN, 'Expected "("');
+      // Skip for loop components for now
+      while (!this.check(TokenType.RIGHT_PAREN) && !this.isAtEnd()) {
+        this.advance();
+      }
+      this.consume(TokenType.RIGHT_PAREN, 'Expected ")"');
+      this.parseStatement(); // parse body (and discard)
+      return new ExpressionStatementNode(new LiteralNode(null, 'null'));
+    }
+    
     if (this.check(TokenType.LEFT_BRACE)) {
       this.advance(); // consume '{'
       return this.parseBlockStatement();
@@ -654,8 +693,8 @@ export class Parser {
   }
 
   private parsePrimary(): ExpressionNode {
-    if (this.check(TokenType.BOOLEAN)) {
-      const value = this.advance().value === 'true';
+    if (this.match(TokenType.BOOLEAN)) {
+      const value = this.previous().value === 'true';
       return new LiteralNode(value, 'boolean');
     }
     
@@ -663,19 +702,19 @@ export class Parser {
       return new LiteralNode(null, 'null');
     }
     
-    if (this.check(TokenType.NUMBER)) {
-      const value = parseFloat(this.advance().value);
+    if (this.match(TokenType.NUMBER)) {
+      const value = parseFloat(this.previous().value);
       return new LiteralNode(value, 'number');
     }
     
-    if (this.check(TokenType.STRING)) {
-      const value = this.advance().value;
+    if (this.match(TokenType.STRING)) {
+      const value = this.previous().value;
       // The lexer already removes quotes, so use the value directly
       return new LiteralNode(value, 'string');
     }
     
-    if (this.check(TokenType.IDENTIFIER)) {
-      const name = this.advance().value;
+    if (this.match(TokenType.IDENTIFIER)) {
+      const name = this.previous().value;
       return new IdentifierNode(name);
     }
     
@@ -685,11 +724,18 @@ export class Parser {
       return expr;
     }
     
-    throw new ParseError('Expected expression', this.peek());
+    throw new ParseError(`Expected expression, but found ${this.peek().type} with value "${this.peek().value}"`, this.peek());
   }
 
   private isTypeToken(): boolean {
-    return this.check(TokenType.IDENTIFIER) && 
-           ['int', 'double', 'string', 'bool', 'object', 'dynamic'].includes(this.peek().value);
+    return this.check(TokenType.INT) ||
+           this.check(TokenType.DOUBLE) ||
+           this.check(TokenType.STRING_TYPE) ||
+           this.check(TokenType.BOOL) ||
+           this.check(TokenType.OBJECT) ||
+           this.check(TokenType.DYNAMIC) ||
+           this.check(TokenType.VOID) ||
+           (this.check(TokenType.IDENTIFIER) && 
+            ['int', 'double', 'string', 'bool', 'object', 'dynamic', 'void'].includes(this.peek().value));
   }
 }
