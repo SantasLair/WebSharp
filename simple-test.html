@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSharp Simple Test</title>
+</head>
+<body>
+    <h1>WebSharp Simple Test</h1>
+    <p>Check the browser console for WebSharp output!</p>
+    
+    <!-- Include WebSharp Runtime -->
+    <script src="websharp-runtime.js"></script>
+    
+    <!-- Very basic test -->
+    <wscript>
+    Console.WriteLine("Hello from WebSharp!");
+    </wscript>
+    
+    <!-- Test JavaScript after WebSharp -->
+    <script>
+    console.log("Regular JavaScript works fine");
+    
+    // Check wscript tags after page loads
+    setTimeout(() => {
+        const wscriptTags = document.querySelectorAll('wscript');
+        console.log(`Found ${wscriptTags.length} wscript tags`);
+        wscriptTags.forEach((tag, i) => {
+            console.log(`Tag ${i}:`, tag.textContent);
+        });
+    }, 500);
+    </script>
+</body>
+</html>

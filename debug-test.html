@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSharp Debug Test</title>
+</head>
+<body>
+    <h1>WebSharp Debug Test</h1>
+    <div id="debug-output"></div>
+    
+    <!-- Test basic JavaScript first -->
+    <script>
+    console.log("✅ Basic JavaScript works");
+    const debugDiv = document.getElementById('debug-output');
+    debugDiv.innerHTML = '<p>✅ Basic JavaScript DOM manipulation works</p>';
+    </script>
+    
+    <!-- Load WebSharp runtime and test -->
+    <script src="websharp-runtime.js"></script>
+    
+    <!-- Test if runtime loaded -->
+    <script>
+    setTimeout(() => {
+        console.log("Checking WebSharp runtime...");
+        debugDiv.innerHTML += `<p>WebSharpRuntime: ${typeof window.WebSharpRuntime}</p>`;
+        debugDiv.innerHTML += `<p>WebSharpDOM: ${typeof window.WebSharpDOM}</p>`;
+        
+        // Try manual compilation
+        if (window.WebSharpRuntime && window.WebSharpRuntime.compiler) {
+            console.log("Testing manual compilation...");
+            const testCode = 'Console.WriteLine("Test compilation");';
+            try {
+                const result = window.WebSharpRuntime.compiler.compileToJavaScript(testCode);
+                console.log("Compilation result:", result);
+                debugDiv.innerHTML += `<p>Manual compilation: ${result}</p>`;
+            } catch (e) {
+                console.error("Manual compilation error:", e);
+                debugDiv.innerHTML += `<p>Manual compilation error: ${e.message}</p>`;
+            }
+        }
+    }, 500);
+    </script>
+    
+    <!-- Simple wscript test -->
+    <wscript>
+    Console.WriteLine("Hello WebSharp");
+    </wscript>
+    
+    <!-- Check if wscript was processed -->
+    <script>
+    setTimeout(() => {
+        const wscripts = document.querySelectorAll('wscript');
+        debugDiv.innerHTML += `<p>Found ${wscripts.length} wscript tags</p>`;
+        if (wscripts.length > 0) {
+            debugDiv.innerHTML += `<p>First wscript content: ${wscripts[0].textContent}</p>`;
+        }
+    }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Minimal WebSharp Test</title>
+</head>
+<body>
+    <h1>🎯 Minimal WebSharp Test</h1>
+    <p>Testing the minimal WebSharp runtime...</p>
+    
+    <!-- Use minimal runtime -->
+    <script src="minimal-runtime.js"></script>
+    
+    <!-- Simple test -->
+    <wscript>
+    Console.WriteLine("Hello from minimal WebSharp!");
+    </wscript>
+    
+    <!-- DOM test -->
+    <wscript>
+    var button = new HTMLButtonElement();
+    button.TextContent = "WebSharp Button";
+    button.Style.BackgroundColor = "#4caf50";
+    button.Style.Color = "white";
+    button.Style.Padding = "10px 20px";
+    Document.Body.AppendChild(button);
+    </wscript>
+    
+    <!-- Status check -->
+    <script>
+    setTimeout(() => {
+        const status = document.createElement('div');
+        status.style.cssText = 'background: #e8f5e8; border: 1px solid #4caf50; padding: 10px; margin: 10px 0;';
+        status.innerHTML = `
+            <h3>Status Check:</h3>
+            <p>wscript tags found: ${document.querySelectorAll('wscript').length}</p>
+            <p>Check console for detailed logs!</p>
+        `;
+        document.body.appendChild(status);
+    }, 1000);
+    </script>
+</body>
+</html>

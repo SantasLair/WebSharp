@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSharp Runtime Test</title>
+</head>
+<body>
+    <h1>WebSharp Runtime Test</h1>
+    <div id="test-output"></div>
+    
+    <!-- Include WebSharp Runtime -->
+    <script src="websharp-runtime.js"></script>
+    
+    <!-- Test 1: Simple console output -->
+    <wscript>
+    Console.WriteLine("✅ WebSharp <wscript> tag is working!");
+    </wscript>
+    
+    <!-- Test 2: DOM manipulation -->
+    <wscript>
+    public class SimpleTest {
+        public static void CreateTestElement() {
+            var testDiv = new HTMLDivElement();
+            testDiv.TextContent = "🎉 WebSharp DOM manipulation works!";
+            testDiv.Style.BackgroundColor = "#e8f5e8";
+            testDiv.Style.Padding = "10px";
+            testDiv.Style.Border = "2px solid #4caf50";
+            testDiv.Style.BorderRadius = "5px";
+            testDiv.Style.Margin = "10px 0";
+            Document.Body.AppendChild(testDiv);
+        }
+    }
+    SimpleTest.CreateTestElement();
+    </wscript>
+    
+    <!-- Test 3: Verify runtime is loaded -->
+    <script>
+    console.log("📋 Runtime status:", window.WebSharpRuntime ? "✅ Loaded" : "❌ Not loaded");
+    console.log("📋 WebSharpDOM status:", window.WebSharpDOM ? "✅ Available" : "❌ Not available");
+    
+    // Check if wscript tags were processed
+    const wscriptTags = document.querySelectorAll('wscript');
+    console.log(`📋 Found ${wscriptTags.length} <wscript> tags`);
+    
+    // Display status in the page
+    setTimeout(() => {
+        const output = document.getElementById('test-output');
+        output.innerHTML = `
+            <h2>Runtime Status:</h2>
+            <p>WebSharp Runtime: ${window.WebSharpRuntime ? '✅ Loaded' : '❌ Not loaded'}</p>
+            <p>WebSharpDOM: ${window.WebSharpDOM ? '✅ Available' : '❌ Not available'}</p>
+            <p>wscript tags found: ${wscriptTags.length}</p>
+            <p>Check console for WebSharp output!</p>
+        `;
+    }, 100);
+    </script>
+</body>
+</html>
