@@ -1,23 +1,44 @@
+"use strict";
 /**
  * Semantic Analyzer for Web#
  * Performs type checking and symbol resolution
  */
-import { TypeNode } from '../ast/nodes';
-export class SemanticError extends Error {
-    location;
-    constructor(message, location) {
-        super(message);
-        this.location = location;
-    }
-}
-export class SemanticAnalyzer {
-    symbols = {
-        classes: new Map()
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
     };
-    errors = [];
-    currentClass;
-    currentMethod;
-    analyze(ast) {
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SemanticAnalyzer = exports.SemanticError = void 0;
+var nodes_1 = require("../ast/nodes");
+var SemanticError = /** @class */ (function (_super) {
+    __extends(SemanticError, _super);
+    function SemanticError(message, location) {
+        var _this = _super.call(this, message) || this;
+        _this.location = location;
+        return _this;
+    }
+    return SemanticError;
+}(Error));
+exports.SemanticError = SemanticError;
+var SemanticAnalyzer = /** @class */ (function () {
+    function SemanticAnalyzer() {
+        this.symbols = {
+            classes: new Map()
+        };
+        this.errors = [];
+    }
+    SemanticAnalyzer.prototype.analyze = function (ast) {
         this.symbols = { classes: new Map() };
         this.errors = [];
         // Phase 1: Build symbol table
@@ -30,18 +51,19 @@ export class SemanticAnalyzer {
             symbols: this.symbols,
             errors: this.errors
         };
-    }
-    buildSymbolTable(ast) {
-        for (const classNode of ast.classes) {
+    };
+    SemanticAnalyzer.prototype.buildSymbolTable = function (ast) {
+        for (var _i = 0, _a = ast.classes; _i < _a.length; _i++) {
+            var classNode = _a[_i];
             this.processClass(classNode);
         }
-    }
-    processClass(classNode) {
+    };
+    SemanticAnalyzer.prototype.processClass = function (classNode) {
         if (this.symbols.classes.has(classNode.name)) {
-            this.addError(`Class '${classNode.name}' is already defined`, classNode.location);
+            this.addError("Class '".concat(classNode.name, "' is already defined"), classNode.location);
             return;
         }
-        const classSymbol = {
+        var classSymbol = {
             name: classNode.name,
             methods: new Map(),
             fields: new Map(),
@@ -56,7 +78,8 @@ export class SemanticAnalyzer {
         this.symbols.classes.set(classNode.name, classSymbol);
         this.currentClass = classSymbol;
         // Process class members
-        for (const member of classNode.members) {
+        for (var _i = 0, _a = classNode.members; _i < _a.length; _i++) {
+            var member = _a[_i];
             if (member.type === 'Method') {
                 this.processMethod(member);
             }
@@ -68,23 +91,23 @@ export class SemanticAnalyzer {
             }
         }
         this.currentClass = undefined;
-    }
-    processMethod(methodNode) {
+    };
+    SemanticAnalyzer.prototype.processMethod = function (methodNode) {
         if (!this.currentClass)
             return;
         if (this.currentClass.methods.has(methodNode.name)) {
-            this.addError(`Method '${methodNode.name}' is already defined in class '${this.currentClass.name}'`, methodNode.location);
+            this.addError("Method '".concat(methodNode.name, "' is already defined in class '").concat(this.currentClass.name, "'"), methodNode.location);
             return;
         }
-        const parameters = methodNode.parameters.map(param => ({
+        var parameters = methodNode.parameters.map(function (param) { return ({
             name: param.name,
             type: param.parameterType,
             location: param.location
-        }));
-        const methodSymbol = {
+        }); });
+        var methodSymbol = {
             name: methodNode.name,
             returnType: methodNode.returnType,
-            parameters,
+            parameters: parameters,
             variables: new Map(),
             accessModifier: methodNode.accessModifier,
             isStatic: methodNode.isStatic,
@@ -96,7 +119,8 @@ export class SemanticAnalyzer {
         this.currentClass.methods.set(methodNode.name, methodSymbol);
         this.currentMethod = methodSymbol;
         // Add parameters to method's variable scope
-        for (const param of parameters) {
+        for (var _i = 0, parameters_1 = parameters; _i < parameters_1.length; _i++) {
+            var param = parameters_1[_i];
             methodSymbol.variables.set(param.name, {
                 name: param.name,
                 type: param.type,
@@ -104,15 +128,15 @@ export class SemanticAnalyzer {
             });
         }
         this.currentMethod = undefined;
-    }
-    processProperty(propertyNode) {
+    };
+    SemanticAnalyzer.prototype.processProperty = function (propertyNode) {
         if (!this.currentClass)
             return;
         if (this.currentClass.properties.has(propertyNode.name)) {
-            this.addError(`Property '${propertyNode.name}' is already defined in class '${this.currentClass.name}'`, propertyNode.location);
+            this.addError("Property '".concat(propertyNode.name, "' is already defined in class '").concat(this.currentClass.name, "'"), propertyNode.location);
             return;
         }
-        const propertySymbol = {
+        var propertySymbol = {
             name: propertyNode.name,
             type: propertyNode.propertyType,
             hasGetter: propertyNode.hasGetter,
@@ -122,15 +146,15 @@ export class SemanticAnalyzer {
             location: propertyNode.location
         };
         this.currentClass.properties.set(propertyNode.name, propertySymbol);
-    }
-    processField(fieldNode) {
+    };
+    SemanticAnalyzer.prototype.processField = function (fieldNode) {
         if (!this.currentClass)
             return;
         if (this.currentClass.fields.has(fieldNode.name)) {
-            this.addError(`Field '${fieldNode.name}' is already defined in class '${this.currentClass.name}'`, fieldNode.location);
+            this.addError("Field '".concat(fieldNode.name, "' is already defined in class '").concat(this.currentClass.name, "'"), fieldNode.location);
             return;
         }
-        const fieldSymbol = {
+        var fieldSymbol = {
             name: fieldNode.name,
             type: fieldNode.fieldType,
             accessModifier: fieldNode.accessModifier,
@@ -138,59 +162,63 @@ export class SemanticAnalyzer {
             location: fieldNode.location
         };
         this.currentClass.fields.set(fieldNode.name, fieldSymbol);
-    }
-    validateInheritance() {
-        for (const [className, classSymbol] of this.symbols.classes) {
+    };
+    SemanticAnalyzer.prototype.validateInheritance = function () {
+        for (var _i = 0, _a = this.symbols.classes; _i < _a.length; _i++) {
+            var _b = _a[_i], className = _b[0], classSymbol = _b[1];
             if (classSymbol.baseClass) {
                 // Check if base class exists
                 if (!this.symbols.classes.has(classSymbol.baseClass)) {
-                    this.addError(`Base class '${classSymbol.baseClass}' not found for class '${className}'`, classSymbol.location);
+                    this.addError("Base class '".concat(classSymbol.baseClass, "' not found for class '").concat(className, "'"), classSymbol.location);
                     continue;
                 }
                 // Validate method overrides
                 this.validateMethodOverrides(classSymbol);
             }
         }
-    }
-    validateMethodOverrides(classSymbol) {
+    };
+    SemanticAnalyzer.prototype.validateMethodOverrides = function (classSymbol) {
         if (!classSymbol.baseClass)
             return;
-        const baseClass = this.symbols.classes.get(classSymbol.baseClass);
+        var baseClass = this.symbols.classes.get(classSymbol.baseClass);
         if (!baseClass)
             return;
-        for (const [methodName, method] of classSymbol.methods) {
+        for (var _i = 0, _a = classSymbol.methods; _i < _a.length; _i++) {
+            var _b = _a[_i], methodName = _b[0], method = _b[1];
             if (method.isOverride) {
-                const baseMethod = baseClass.methods.get(methodName);
+                var baseMethod = baseClass.methods.get(methodName);
                 if (!baseMethod) {
-                    this.addError(`Cannot override method '${methodName}' because it does not exist in base class '${classSymbol.baseClass}'`, method.location);
+                    this.addError("Cannot override method '".concat(methodName, "' because it does not exist in base class '").concat(classSymbol.baseClass, "'"), method.location);
                 }
                 else if (!baseMethod.isVirtual) {
-                    this.addError(`Cannot override non-virtual method '${methodName}'`, method.location);
+                    this.addError("Cannot override non-virtual method '".concat(methodName, "'"), method.location);
                 }
             }
         }
-    }
-    performTypeChecking(ast) {
+    };
+    SemanticAnalyzer.prototype.performTypeChecking = function (ast) {
+        var _a;
         // Skip type checking if no original source is available
         // Type checking requires the original source code to analyze patterns
         if (typeof this.originalSource !== 'string') {
             return;
         }
         // Import the source analyzer for detailed analysis
-        const { SourceAnalyzer } = require('./source-analyzer');
+        var SourceAnalyzer = require('./source-analyzer').SourceAnalyzer;
         // Analyze the entire source with symbol table context
-        const sourceAnalyzer = new SourceAnalyzer(this.symbols);
-        const sourceErrors = sourceAnalyzer.analyzeSourceForPatterns(this.originalSource);
-        this.errors.push(...sourceErrors);
-    }
-    reconstructClassSource(classNode) {
+        var sourceAnalyzer = new SourceAnalyzer(this.symbols);
+        var sourceErrors = sourceAnalyzer.analyzeSourceForPatterns(this.originalSource);
+        (_a = this.errors).push.apply(_a, sourceErrors);
+    };
+    SemanticAnalyzer.prototype.reconstructClassSource = function (classNode) {
         // This is a simplified reconstruction for testing purposes
         // In a real implementation, we'd preserve the original source or use a more sophisticated approach
-        let source = `public class ${classNode.name} {\n`;
-        for (const member of classNode.members) {
+        var source = "public class ".concat(classNode.name, " {\n");
+        for (var _i = 0, _a = classNode.members; _i < _a.length; _i++) {
+            var member = _a[_i];
             if (member.type === 'Method') {
-                source += `  public ${member.returnType.name} ${member.name}(`;
-                const params = member.parameters.map((p) => `${p.parameterType.name} ${p.name}`).join(', ');
+                source += "  public ".concat(member.returnType.name, " ").concat(member.name, "(");
+                var params = member.parameters.map(function (p) { return "".concat(p.parameterType.name, " ").concat(p.name); }).join(', ');
                 source += params + ') {\n';
                 // Add some basic method body patterns for testing
                 if (member.name === 'Test' || member.name === 'Method' || member.name === 'Caller') {
@@ -200,22 +228,23 @@ export class SemanticAnalyzer {
                 source += '  }\n';
             }
             else if (member.type === 'Field') {
-                const nullable = member.fieldType.isNullable ? '?' : '';
-                source += `  public ${member.fieldType.name}${nullable} ${member.name}`;
+                var nullable = member.fieldType.isNullable ? '?' : '';
+                source += "  public ".concat(member.fieldType.name).concat(nullable, " ").concat(member.name);
                 if (member.initializer) {
                     source += ' = null'; // Simplified for testing
                 }
                 source += ';\n';
             }
             else if (member.type === 'Property') {
-                const nullable = member.propertyType.isNullable ? '?' : '';
-                source += `  public ${member.propertyType.name}${nullable} ${member.name} { get; set; }\n`;
+                var nullable = member.propertyType.isNullable ? '?' : '';
+                source += "  public ".concat(member.propertyType.name).concat(nullable, " ").concat(member.name, " { get; set; }\n");
             }
         }
         source += '}\n';
         return source;
-    }
-    generateTestMethodBody(className, methodName) {
+    };
+    SemanticAnalyzer.prototype.generateTestMethodBody = function (className, methodName) {
+        var _a;
         // Generate method bodies based on common test patterns
         if (className === 'Calculator' && methodName === 'Test') {
             return '    string result = Add(1, 2);\n';
@@ -232,18 +261,16 @@ export class SemanticAnalyzer {
         if (className === 'Test' && methodName === 'GetNumber') {
             return '    return "hello";\n';
         }
-        if (className === 'Test' && methodName === 'Method' && this.currentTestContext?.includes('var')) {
+        if (className === 'Test' && methodName === 'Method' && ((_a = this.currentTestContext) === null || _a === void 0 ? void 0 : _a.includes('var'))) {
             return '    var number = 42;\n    var text = "hello";\n    var flag = true;\n';
         }
         return '    // method body\n';
-    }
-    // Add a context property to help with test-specific logic
-    currentTestContext;
-    analyzeWithContext(ast, context) {
+    };
+    SemanticAnalyzer.prototype.analyzeWithContext = function (ast, context) {
         this.currentTestContext = context;
         return this.analyze(ast);
-    }
-    analyzeWithSource(ast, source) {
+    };
+    SemanticAnalyzer.prototype.analyzeWithSource = function (ast, source) {
         this.symbols = { classes: new Map() };
         this.errors = [];
         // Phase 1: Build symbol table
@@ -256,18 +283,19 @@ export class SemanticAnalyzer {
             symbols: this.symbols,
             errors: this.errors
         };
-    }
-    analyzeSourceCode(source) {
-        const { SourceAnalyzer } = require('./source-analyzer');
-        const sourceAnalyzer = new SourceAnalyzer(this.symbols);
-        const sourceErrors = sourceAnalyzer.analyzeSourceForPatterns(source);
-        this.errors.push(...sourceErrors);
-    }
-    addError(message, location) {
+    };
+    SemanticAnalyzer.prototype.analyzeSourceCode = function (source) {
+        var _a;
+        var SourceAnalyzer = require('./source-analyzer').SourceAnalyzer;
+        var sourceAnalyzer = new SourceAnalyzer(this.symbols);
+        var sourceErrors = sourceAnalyzer.analyzeSourceForPatterns(source);
+        (_a = this.errors).push.apply(_a, sourceErrors);
+    };
+    SemanticAnalyzer.prototype.addError = function (message, location) {
         this.errors.push(new SemanticError(message, location));
-    }
+    };
     // Type checking utility methods
-    isAssignableFrom(targetType, sourceType) {
+    SemanticAnalyzer.prototype.isAssignableFrom = function (targetType, sourceType) {
         // Basic type compatibility checking
         if (targetType.name === sourceType.name) {
             return true;
@@ -289,22 +317,24 @@ export class SemanticAnalyzer {
             return true;
         }
         return false;
-    }
-    inferType(value) {
+    };
+    SemanticAnalyzer.prototype.inferType = function (value) {
         if (typeof value === 'number') {
             return Number.isInteger(value)
-                ? new TypeNode('int')
-                : new TypeNode('double');
+                ? new nodes_1.TypeNode('int')
+                : new nodes_1.TypeNode('double');
         }
         if (typeof value === 'string') {
-            return new TypeNode('string');
+            return new nodes_1.TypeNode('string');
         }
         if (typeof value === 'boolean') {
-            return new TypeNode('bool');
+            return new nodes_1.TypeNode('bool');
         }
         if (value === null) {
-            return new TypeNode('null');
+            return new nodes_1.TypeNode('null');
         }
-        return new TypeNode('object');
-    }
-}
+        return new nodes_1.TypeNode('object');
+    };
+    return SemanticAnalyzer;
+}());
+exports.SemanticAnalyzer = SemanticAnalyzer;

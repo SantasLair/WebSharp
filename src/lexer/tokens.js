@@ -1,7 +1,10 @@
+"use strict";
 /**
  * Token definitions for Web# lexer
  */
-export var TokenType;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.KEYWORDS = exports.TokenType = void 0;
+var TokenType;
 (function (TokenType) {
     // Literals
     TokenType["STRING"] = "STRING";
@@ -101,8 +104,8 @@ export var TokenType;
     TokenType["WHITESPACE"] = "WHITESPACE";
     // Error
     TokenType["UNKNOWN"] = "UNKNOWN";
-})(TokenType || (TokenType = {}));
-export const KEYWORDS = {
+})(TokenType || (exports.TokenType = TokenType = {}));
+exports.KEYWORDS = {
     'class': TokenType.CLASS,
     'public': TokenType.PUBLIC,
     'private': TokenType.PRIVATE,

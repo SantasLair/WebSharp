@@ -27,6 +27,9 @@ import {
   MemberExpressionNode,
   JSCallExpressionNode,
   JSSetExpressionNode,
+  DOMConstructorNode,
+  DOMPropertyAccessNode,
+  DOMMethodCallNode,
   AccessModifier,
   SourceLocation,
   Position
@@ -695,6 +698,29 @@ export class Parser {
   }
 
   private parsePrimary(): ExpressionNode {
+    // Handle new expressions (DOM constructors)
+    if (this.match(TokenType.NEW)) {
+      const type = this.parseType();
+      
+      // Check if this is a DOM type
+      if (this.isDOMType(type.name)) {
+        this.consume(TokenType.LEFT_PAREN, 'Expected "(" after DOM constructor');
+        const args: ExpressionNode[] = [];
+        
+        if (!this.check(TokenType.RIGHT_PAREN)) {
+          do {
+            args.push(this.parseExpression());
+          } while (this.match(TokenType.COMMA));
+        }
+        
+        this.consume(TokenType.RIGHT_PAREN, 'Expected ")" after arguments');
+        return new DOMConstructorNode(type.name, args);
+      }
+      
+      // Fall back to regular constructor handling (future implementation)
+      throw new ParseError(`Constructor for type ${type.name} not yet implemented`, this.peek());
+    }
+
     // Handle JS interop
     if (this.match(TokenType.JS)) {
       this.consume(TokenType.DOT, 'Expected "." after "JS"');
@@ -797,5 +823,26 @@ export class Parser {
     this.consume(TokenType.RIGHT_PAREN, 'Expected ")" after value argument');
     
     return new JSSetExpressionNode(object, property, value);
+  }
+
+  /**
+   * Check if a type name is a DOM type that should be handled by the runtime bridge
+   */
+  private isDOMType(typeName: string): boolean {
+    const domTypes = [
+      // Base DOM types
+      'Node', 'Element', 'HTMLElement', 'Document',
+      
+      // Specific HTML elements
+      'HTMLButtonElement', 'HTMLInputElement', 'HTMLDivElement', 
+      'HTMLSpanElement', 'HTMLFormElement', 'HTMLTextAreaElement',
+      'HTMLImageElement', 'HTMLAnchorElement', 'HTMLUListElement',
+      'HTMLLIElement', 'HTMLTableElement', 'HTMLCanvasElement',
+      
+      // DOM utility types
+      'CSSStyleDeclaration', 'DOMTokenList', 'FormData',
+      'HTMLCollection', 'NodeList'
+    ];
+    return domTypes.includes(typeName);
   }
 }

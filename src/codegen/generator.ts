@@ -27,6 +27,9 @@ import {
   MemberExpressionNode,
   JSCallExpressionNode,
   JSSetExpressionNode,
+  DOMConstructorNode,
+  DOMPropertyAccessNode,
+  DOMMethodCallNode,
   AccessModifier
 } from '../ast/nodes';
 
@@ -57,12 +60,18 @@ export class JavaScriptGenerator {
     output.push('// Web# - Browser-native C#-like language');
     output.push('');
 
-    // Check if JS interop is used
+    // Check if JS interop or DOM API is used
     const usesJSInterop = this.detectJSInterop(ast);
+    const usesDOMAPI = this.detectDOMAPI(ast);
     
     // Generate JS runtime if needed
     if (usesJSInterop) {
       output.push(this.generateJSRuntime());
+    }
+
+    // Generate DOM runtime if needed (Phase 5)
+    if (usesDOMAPI) {
+      output.push(this.generateDOMRuntime());
     }
 
     // Generate Console.WriteLine polyfill
@@ -348,6 +357,18 @@ const Console = {
         const jsSet = expression as JSSetExpressionNode;
         return this.generateJSSetExpression(jsSet);
         
+      case 'DOMConstructor':
+        const domCtor = expression as DOMConstructorNode;
+        return this.generateDOMConstructor(domCtor);
+        
+      case 'DOMPropertyAccess':
+        const domProp = expression as DOMPropertyAccessNode;
+        return this.generateDOMPropertyAccess(domProp);
+        
+      case 'DOMMethodCall':
+        const domMethod = expression as DOMMethodCallNode;
+        return this.generateDOMMethodCall(domMethod);
+        
       default:
         return `/* TODO: Expression type ${expression.type} */`;
     }
@@ -416,6 +437,27 @@ const Console = {
     return `JS.Set(${object}, ${property}, ${value})`;
   }
 
+  // Phase 5: DOM API Generator Methods
+  private generateDOMConstructor(node: DOMConstructorNode): string {
+    const args = node.args.map(arg => this.generateExpression(arg)).join(', ');
+    return `new WebSharpDOM.${node.domType}(${args})`;
+  }
+
+  private generateDOMPropertyAccess(node: DOMPropertyAccessNode): string {
+    const object = this.generateExpression(node.object);
+    if (node.isAssignment && node.value) {
+      const value = this.generateExpression(node.value);
+      return `${object}.${node.property} = ${value}`;
+    }
+    return `${object}.${node.property}`;
+  }
+
+  private generateDOMMethodCall(node: DOMMethodCallNode): string {
+    const object = this.generateExpression(node.object);
+    const args = node.args.map(arg => this.generateExpression(arg)).join(', ');
+    return `${object}.${node.method}(${args})`;
+  }
+
   private generateJSRuntime(): string {
     return `// JavaScript Interop Runtime
 const JS = {
@@ -437,6 +479,145 @@ const JS = {
 `;
   }
 
+  private generateDOMRuntime(): string {
+    return `// WebSharp DOM Runtime Bridge - Phase 5
+const WebSharpDOM = {
+  // Base element wrapper
+  Element: class {
+    constructor(domElement) {
+      this._dom = domElement;
+    }
+    
+    // Properties
+    get TextContent() { return this._dom.textContent; }
+    set TextContent(value) { this._dom.textContent = value; }
+    
+    get InnerHTML() { return this._dom.innerHTML; }
+    set InnerHTML(value) { this._dom.innerHTML = value; }
+    
+    get Id() { return this._dom.id; }
+    set Id(value) { this._dom.id = value; }
+    
+    get ClassName() { return this._dom.className; }
+    set ClassName(value) { this._dom.className = value; }
+    
+    get Style() {
+      if (!this._style) {
+        this._style = new WebSharpDOM.CSSStyleDeclaration(this._dom.style);
+      }
+      return this._style;
+    }
+    
+    // Methods
+    AppendChild(child) {
+      this._dom.appendChild(child._dom);
+    }
+    
+    RemoveChild(child) {
+      this._dom.removeChild(child._dom);
+    }
+    
+    QuerySelector(selector) {
+      const element = this._dom.querySelector(selector);
+      return element ? new WebSharpDOM.Element(element) : null;
+    }
+    
+    SetAttribute(name, value) {
+      this._dom.setAttribute(name, value);
+    }
+    
+    GetAttribute(name) {
+      return this._dom.getAttribute(name);
+    }
+  },
+  
+  // HTML Elements
+  HTMLButtonElement: class extends WebSharpDOM.Element {
+    constructor() {
+      super(document.createElement('button'));
+    }
+    
+    get Type() { return this._dom.type; }
+    set Type(value) { this._dom.type = value; }
+  },
+  
+  HTMLInputElement: class extends WebSharpDOM.Element {
+    constructor() {
+      super(document.createElement('input'));
+    }
+    
+    get Value() { return this._dom.value; }
+    set Value(value) { this._dom.value = value; }
+    
+    get Type() { return this._dom.type; }
+    set Type(value) { this._dom.type = value; }
+    
+    get Placeholder() { return this._dom.placeholder; }
+    set Placeholder(value) { this._dom.placeholder = value; }
+  },
+  
+  HTMLDivElement: class extends WebSharpDOM.Element {
+    constructor() {
+      super(document.createElement('div'));
+    }
+  },
+  
+  HTMLFormElement: class extends WebSharpDOM.Element {
+    constructor() {
+      super(document.createElement('form'));
+    }
+  },
+  
+  // CSS wrapper
+  CSSStyleDeclaration: class {
+    constructor(style) {
+      this._style = style;
+    }
+    
+    get BackgroundColor() { return this._style.backgroundColor; }
+    set BackgroundColor(value) { this._style.backgroundColor = value; }
+    
+    get Color() { return this._style.color; }
+    set Color(value) { this._style.color = value; }
+    
+    get Padding() { return this._style.padding; }
+    set Padding(value) { this._style.padding = value; }
+    
+    get Margin() { return this._style.margin; }
+    set Margin(value) { this._style.margin = value; }
+    
+    get Border() { return this._style.border; }
+    set Border(value) { this._style.border = value; }
+    
+    get BorderRadius() { return this._style.borderRadius; }
+    set BorderRadius(value) { this._style.borderRadius = value; }
+  },
+  
+  // Document static class equivalent
+  Document: {
+    get Body() {
+      return new WebSharpDOM.Element(document.body);
+    },
+    
+    CreateElement(tagName) {
+      return new WebSharpDOM.Element(document.createElement(tagName));
+    },
+    
+    QuerySelector(selector) {
+      const element = document.querySelector(selector);
+      return element ? new WebSharpDOM.Element(element) : null;
+    },
+    
+    QuerySelectorAll(selector) {
+      const elements = document.querySelectorAll(selector);
+      return Array.from(elements).map(el => new WebSharpDOM.Element(el));
+    }
+  }
+};
+
+`;
+  }
+
   private detectJSInterop(ast: CompilationUnitNode): boolean {
     // Recursively check all expressions in the AST for JS interop usage
     for (const classNode of ast.classes) {
@@ -445,6 +626,79 @@ const JS = {
       }
     }
     return false;
+  }
+
+  private detectDOMAPI(ast: CompilationUnitNode): boolean {
+    // Recursively check all expressions in the AST for DOM API usage
+    for (const classNode of ast.classes) {
+      if (this.detectDOMAPIInClass(classNode)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private detectDOMAPIInClass(classNode: ClassNode): boolean {
+    for (const member of classNode.members) {
+      if (member.type === 'Method') {
+        const method = member as MethodNode;
+        if (method.body && this.detectDOMAPIInStatement(method.body)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  private detectDOMAPIInStatement(statement: StatementNode): boolean {
+    switch (statement.type) {
+      case 'BlockStatement':
+        const block = statement as BlockStatementNode;
+        return block.statements.some(stmt => this.detectDOMAPIInStatement(stmt));
+      
+      case 'ExpressionStatement':
+        const exprStmt = statement as ExpressionStatementNode;
+        return this.detectDOMAPIInExpression(exprStmt.expression);
+      
+      case 'VariableDeclaration':
+        const varDecl = statement as VariableDeclarationNode;
+        return varDecl.initializer ? this.detectDOMAPIInExpression(varDecl.initializer) : false;
+      
+      case 'ReturnStatement':
+        const returnStmt = statement as ReturnStatementNode;
+        return returnStmt.argument ? this.detectDOMAPIInExpression(returnStmt.argument) : false;
+      
+      default:
+        return false;
+    }
+  }
+
+  private detectDOMAPIInExpression(expression: ExpressionNode): boolean {
+    switch (expression.type) {
+      case 'DOMConstructor':
+      case 'DOMPropertyAccess':
+      case 'DOMMethodCall':
+        return true;
+      
+      case 'BinaryExpression':
+        const binary = expression as BinaryExpressionNode;
+        return this.detectDOMAPIInExpression(binary.left) || this.detectDOMAPIInExpression(binary.right);
+      
+      case 'AssignmentExpression':
+        const assignment = expression as AssignmentExpressionNode;
+        return this.detectDOMAPIInExpression(assignment.left) || this.detectDOMAPIInExpression(assignment.right);
+      
+      case 'CallExpression':
+        const call = expression as CallExpressionNode;
+        return this.detectDOMAPIInExpression(call.callee) || call.args.some(arg => this.detectDOMAPIInExpression(arg));
+      
+      case 'MemberExpression':
+        const member = expression as MemberExpressionNode;
+        return this.detectDOMAPIInExpression(member.object) || this.detectDOMAPIInExpression(member.property);
+      
+      default:
+        return false;
+    }
   }
 
   private detectJSInteropInClass(classNode: ClassNode): boolean {

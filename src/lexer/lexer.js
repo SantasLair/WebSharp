@@ -1,76 +1,78 @@
+"use strict";
 /**
  * Lexer implementation for Web#
  */
-import { TokenType, KEYWORDS } from './tokens';
-export class Lexer {
-    input;
-    position = 0;
-    line = 1;
-    column = 1;
-    constructor(input) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Lexer = void 0;
+var tokens_1 = require("./tokens");
+var Lexer = /** @class */ (function () {
+    function Lexer(input) {
+        this.position = 0;
+        this.line = 1;
+        this.column = 1;
         this.input = input;
     }
-    tokenize() {
-        const tokens = [];
+    Lexer.prototype.tokenize = function () {
+        var tokens = [];
         while (!this.isAtEnd()) {
-            const token = this.nextToken();
-            if (token.type !== TokenType.WHITESPACE) {
+            var token = this.nextToken();
+            if (token.type !== tokens_1.TokenType.WHITESPACE) {
                 tokens.push(token);
             }
         }
-        tokens.push(this.createToken(TokenType.EOF, ''));
+        tokens.push(this.createToken(tokens_1.TokenType.EOF, ''));
         return tokens;
-    }
-    nextToken() {
-        const start = this.position;
-        const char = this.advance();
+    };
+    Lexer.prototype.nextToken = function () {
+        var start = this.position;
+        var char = this.advance();
         switch (char) {
             // Whitespace
             case ' ':
             case '\r':
             case '\t':
-                return this.createToken(TokenType.WHITESPACE, char, start);
+                return this.createToken(tokens_1.TokenType.WHITESPACE, char, start);
             case '\n':
                 this.line++;
                 this.column = 1;
-                return this.createToken(TokenType.NEWLINE, char, start);
+                return this.createToken(tokens_1.TokenType.NEWLINE, char, start);
             // Single character tokens
             case '(':
-                return this.createToken(TokenType.LEFT_PAREN, char, start);
+                return this.createToken(tokens_1.TokenType.LEFT_PAREN, char, start);
             case ')':
-                return this.createToken(TokenType.RIGHT_PAREN, char, start);
+                return this.createToken(tokens_1.TokenType.RIGHT_PAREN, char, start);
             case '{':
-                return this.createToken(TokenType.LEFT_BRACE, char, start);
+                return this.createToken(tokens_1.TokenType.LEFT_BRACE, char, start);
             case '}':
-                return this.createToken(TokenType.RIGHT_BRACE, char, start);
+                return this.createToken(tokens_1.TokenType.RIGHT_BRACE, char, start);
             case '[':
-                return this.createToken(TokenType.LEFT_BRACKET, char, start);
+                return this.createToken(tokens_1.TokenType.LEFT_BRACKET, char, start);
             case ']':
-                return this.createToken(TokenType.RIGHT_BRACKET, char, start);
+                return this.createToken(tokens_1.TokenType.RIGHT_BRACKET, char, start);
             case ';':
-                return this.createToken(TokenType.SEMICOLON, char, start);
+                return this.createToken(tokens_1.TokenType.SEMICOLON, char, start);
             case ',':
-                return this.createToken(TokenType.COMMA, char, start);
+                return this.createToken(tokens_1.TokenType.COMMA, char, start);
             // Operators that can be compound
             case '+':
                 if (this.match('+'))
-                    return this.createToken(TokenType.INCREMENT, '++', start);
+                    return this.createToken(tokens_1.TokenType.INCREMENT, '++', start);
                 if (this.match('='))
-                    return this.createToken(TokenType.PLUS_ASSIGN, '+=', start);
-                return this.createToken(TokenType.PLUS, char, start);
+                    return this.createToken(tokens_1.TokenType.PLUS_ASSIGN, '+=', start);
+                return this.createToken(tokens_1.TokenType.PLUS, char, start);
             case '-':
                 if (this.match('-'))
-                    return this.createToken(TokenType.DECREMENT, '--', start);
+                    return this.createToken(tokens_1.TokenType.DECREMENT, '--', start);
                 if (this.match('='))
-                    return this.createToken(TokenType.MINUS_ASSIGN, '-=', start);
-                return this.createToken(TokenType.MINUS, char, start);
+                    return this.createToken(tokens_1.TokenType.MINUS_ASSIGN, '-=', start);
+                return this.createToken(tokens_1.TokenType.MINUS, char, start);
             case '*':
                 if (this.match('='))
-                    return this.createToken(TokenType.MULTIPLY_ASSIGN, '*=', start);
-                return this.createToken(TokenType.MULTIPLY, char, start);
+                    return this.createToken(tokens_1.TokenType.MULTIPLY_ASSIGN, '*=', start);
+                return this.createToken(tokens_1.TokenType.MULTIPLY, char, start);
             case '/':
                 if (this.match('='))
-                    return this.createToken(TokenType.DIVIDE_ASSIGN, '/=', start);
+                    return this.createToken(tokens_1.TokenType.DIVIDE_ASSIGN, '/=', start);
                 if (this.match('/')) {
                     // Single line comment
                     this.skipLineComment();
@@ -81,45 +83,45 @@ export class Lexer {
                     this.skipBlockComment();
                     return this.nextToken();
                 }
-                return this.createToken(TokenType.DIVIDE, char, start);
+                return this.createToken(tokens_1.TokenType.DIVIDE, char, start);
             case '%':
-                return this.createToken(TokenType.MODULO, char, start);
+                return this.createToken(tokens_1.TokenType.MODULO, char, start);
             case '=':
                 if (this.match('='))
-                    return this.createToken(TokenType.EQUAL, '==', start);
+                    return this.createToken(tokens_1.TokenType.EQUAL, '==', start);
                 if (this.match('>'))
-                    return this.createToken(TokenType.ARROW, '=>', start);
-                return this.createToken(TokenType.ASSIGN, char, start);
+                    return this.createToken(tokens_1.TokenType.ARROW, '=>', start);
+                return this.createToken(tokens_1.TokenType.ASSIGN, char, start);
             case '!':
                 if (this.match('='))
-                    return this.createToken(TokenType.NOT_EQUAL, '!=', start);
-                return this.createToken(TokenType.NOT, char, start);
+                    return this.createToken(tokens_1.TokenType.NOT_EQUAL, '!=', start);
+                return this.createToken(tokens_1.TokenType.NOT, char, start);
             case '<':
                 if (this.match('='))
-                    return this.createToken(TokenType.LESS_EQUAL, '<=', start);
-                return this.createToken(TokenType.LESS_THAN, char, start);
+                    return this.createToken(tokens_1.TokenType.LESS_EQUAL, '<=', start);
+                return this.createToken(tokens_1.TokenType.LESS_THAN, char, start);
             case '>':
                 if (this.match('='))
-                    return this.createToken(TokenType.GREATER_EQUAL, '>=', start);
-                return this.createToken(TokenType.GREATER_THAN, char, start);
+                    return this.createToken(tokens_1.TokenType.GREATER_EQUAL, '>=', start);
+                return this.createToken(tokens_1.TokenType.GREATER_THAN, char, start);
             case '&':
                 if (this.match('&'))
-                    return this.createToken(TokenType.AND, '&&', start);
-                return this.createToken(TokenType.UNKNOWN, char, start);
+                    return this.createToken(tokens_1.TokenType.AND, '&&', start);
+                return this.createToken(tokens_1.TokenType.UNKNOWN, char, start);
             case '|':
                 if (this.match('|'))
-                    return this.createToken(TokenType.OR, '||', start);
-                return this.createToken(TokenType.UNKNOWN, char, start);
+                    return this.createToken(tokens_1.TokenType.OR, '||', start);
+                return this.createToken(tokens_1.TokenType.UNKNOWN, char, start);
             case '?':
                 if (this.match('?'))
-                    return this.createToken(TokenType.NULL_COALESCING, '??', start);
+                    return this.createToken(tokens_1.TokenType.NULL_COALESCING, '??', start);
                 if (this.match('.'))
-                    return this.createToken(TokenType.NULL_CONDITIONAL, '?.', start);
-                return this.createToken(TokenType.QUESTION, char, start);
+                    return this.createToken(tokens_1.TokenType.NULL_CONDITIONAL, '?.', start);
+                return this.createToken(tokens_1.TokenType.QUESTION, char, start);
             case '.':
-                return this.createToken(TokenType.DOT, char, start);
+                return this.createToken(tokens_1.TokenType.DOT, char, start);
             case ':':
-                return this.createToken(TokenType.COLON, char, start);
+                return this.createToken(tokens_1.TokenType.COLON, char, start);
             // String literals
             case '"':
                 return this.scanString(start);
@@ -132,11 +134,11 @@ export class Lexer {
                 if (this.isAlpha(char)) {
                     return this.scanIdentifier(start);
                 }
-                return this.createToken(TokenType.UNKNOWN, char, start);
+                return this.createToken(tokens_1.TokenType.UNKNOWN, char, start);
         }
-    }
-    scanString(start) {
-        let value = '';
+    };
+    Lexer.prototype.scanString = function (start) {
+        var value = '';
         while (this.peek() !== '"' && !this.isAtEnd()) {
             if (this.peek() === '\n') {
                 this.line++;
@@ -144,7 +146,7 @@ export class Lexer {
             }
             if (this.peek() === '\\') {
                 this.advance(); // consume backslash
-                const escaped = this.advance();
+                var escaped = this.advance();
                 switch (escaped) {
                     case 'n':
                         value += '\n';
@@ -174,17 +176,17 @@ export class Lexer {
             }
         }
         if (this.isAtEnd()) {
-            throw new Error(`Unterminated string at line ${this.line}, column ${this.column}`);
+            throw new Error("Unterminated string at line ".concat(this.line, ", column ").concat(this.column));
         }
         // Consume closing quote
         this.advance();
-        return this.createToken(TokenType.STRING, value, start);
-    }
-    scanCharLiteral(start) {
-        let value = '';
+        return this.createToken(tokens_1.TokenType.STRING, value, start);
+    };
+    Lexer.prototype.scanCharLiteral = function (start) {
+        var value = '';
         if (this.peek() === '\\') {
             this.advance(); // consume backslash
-            const escaped = this.advance();
+            var escaped = this.advance();
             switch (escaped) {
                 case 'n':
                     value = '\n';
@@ -213,13 +215,13 @@ export class Lexer {
             value = this.advance();
         }
         if (this.peek() !== '\'') {
-            throw new Error(`Unterminated character literal at line ${this.line}, column ${this.column}`);
+            throw new Error("Unterminated character literal at line ".concat(this.line, ", column ").concat(this.column));
         }
         // Consume closing quote
         this.advance();
-        return this.createToken(TokenType.STRING, value, start);
-    }
-    scanNumber(start) {
+        return this.createToken(tokens_1.TokenType.STRING, value, start);
+    };
+    Lexer.prototype.scanNumber = function (start) {
         while (this.isDigit(this.peek())) {
             this.advance();
         }
@@ -230,23 +232,23 @@ export class Lexer {
                 this.advance();
             }
         }
-        const value = this.input.substring(start, this.position);
-        return this.createToken(TokenType.NUMBER, value, start);
-    }
-    scanIdentifier(start) {
+        var value = this.input.substring(start, this.position);
+        return this.createToken(tokens_1.TokenType.NUMBER, value, start);
+    };
+    Lexer.prototype.scanIdentifier = function (start) {
         while (this.isAlphaNumeric(this.peek())) {
             this.advance();
         }
-        const value = this.input.substring(start, this.position);
-        const type = KEYWORDS[value] || TokenType.IDENTIFIER;
+        var value = this.input.substring(start, this.position);
+        var type = tokens_1.KEYWORDS[value] || tokens_1.TokenType.IDENTIFIER;
         return this.createToken(type, value, start);
-    }
-    skipLineComment() {
+    };
+    Lexer.prototype.skipLineComment = function () {
         while (this.peek() !== '\n' && !this.isAtEnd()) {
             this.advance();
         }
-    }
-    skipBlockComment() {
+    };
+    Lexer.prototype.skipBlockComment = function () {
         while (!this.isAtEnd()) {
             if (this.peek() === '\n') {
                 this.line++;
@@ -259,14 +261,14 @@ export class Lexer {
             }
             this.advance();
         }
-    }
-    advance() {
-        const char = this.input.charAt(this.position);
+    };
+    Lexer.prototype.advance = function () {
+        var char = this.input.charAt(this.position);
         this.position++;
         this.column++;
         return char;
-    }
-    match(expected) {
+    };
+    Lexer.prototype.match = function (expected) {
         if (this.isAtEnd())
             return false;
         if (this.input.charAt(this.position) !== expected)
@@ -274,41 +276,43 @@ export class Lexer {
         this.position++;
         this.column++;
         return true;
-    }
-    peek() {
+    };
+    Lexer.prototype.peek = function () {
         if (this.isAtEnd())
             return '\0';
         return this.input.charAt(this.position);
-    }
-    peekNext() {
+    };
+    Lexer.prototype.peekNext = function () {
         if (this.position + 1 >= this.input.length)
             return '\0';
         return this.input.charAt(this.position + 1);
-    }
-    isAtEnd() {
+    };
+    Lexer.prototype.isAtEnd = function () {
         return this.position >= this.input.length;
-    }
-    isDigit(char) {
+    };
+    Lexer.prototype.isDigit = function (char) {
         return char >= '0' && char <= '9';
-    }
-    isAlpha(char) {
+    };
+    Lexer.prototype.isAlpha = function (char) {
         return (char >= 'a' && char <= 'z') ||
             (char >= 'A' && char <= 'Z') ||
             char === '_';
-    }
-    isAlphaNumeric(char) {
+    };
+    Lexer.prototype.isAlphaNumeric = function (char) {
         return this.isAlpha(char) || this.isDigit(char);
-    }
-    createToken(type, value, start) {
-        const tokenStart = start ?? this.position - value.length;
-        const tokenColumn = this.column - value.length;
+    };
+    Lexer.prototype.createToken = function (type, value, start) {
+        var tokenStart = start !== null && start !== void 0 ? start : this.position - value.length;
+        var tokenColumn = this.column - value.length;
         return {
-            type,
-            value,
+            type: type,
+            value: value,
             line: this.line,
             column: tokenColumn,
             start: tokenStart,
             end: this.position
         };
-    }
-}
+    };
+    return Lexer;
+}());
+exports.Lexer = Lexer;

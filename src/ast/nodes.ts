@@ -470,3 +470,67 @@ export class JSSetExpressionNode extends ExpressionNode {
     };
   }
 }
+
+// Phase 5: Native DOM API Expression Nodes
+export class DOMConstructorNode extends ExpressionNode {
+  constructor(
+    public readonly domType: string,
+    public readonly args: ExpressionNode[] = [],
+    location?: SourceLocation
+  ) {
+    super('DOMConstructor', location);
+  }
+
+  toJSON(): Record<string, any> {
+    return {
+      type: this.type,
+      domType: this.domType,
+      arguments: this.args.map(arg => arg.toJSON()),
+      location: this.location
+    };
+  }
+}
+
+export class DOMPropertyAccessNode extends ExpressionNode {
+  constructor(
+    public readonly object: ExpressionNode,
+    public readonly property: string,
+    public readonly isAssignment: boolean = false,
+    public readonly value?: ExpressionNode,
+    location?: SourceLocation
+  ) {
+    super('DOMPropertyAccess', location);
+  }
+
+  toJSON(): Record<string, any> {
+    return {
+      type: this.type,
+      object: this.object.toJSON(),
+      property: this.property,
+      isAssignment: this.isAssignment,
+      value: this.value?.toJSON(),
+      location: this.location
+    };
+  }
+}
+
+export class DOMMethodCallNode extends ExpressionNode {
+  constructor(
+    public readonly object: ExpressionNode,
+    public readonly method: string,
+    public readonly args: ExpressionNode[],
+    location?: SourceLocation
+  ) {
+    super('DOMMethodCall', location);
+  }
+
+  toJSON(): Record<string, any> {
+    return {
+      type: this.type,
+      object: this.object.toJSON(),
+      method: this.method,
+      arguments: this.args.map(arg => arg.toJSON()),
+      location: this.location
+    };
+  }
+}
