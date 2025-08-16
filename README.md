@@ -1,6 +1,6 @@
 # Web# Programming Language Compiler
 
-![CI](https://github.com/SantasLair/WebSharp/workflows/CI/badge.svg)
+![CI](https://github.com/SantasLair/WebSharp/actions/workflows/ci.yml/badge.svg?branch=main)
 ![Tests](https://img.shields.io/badge/tests-47%2F47%20passing-brightgreen)
 ![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
 
