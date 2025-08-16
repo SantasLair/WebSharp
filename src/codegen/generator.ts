@@ -25,6 +25,8 @@ import {
   AssignmentExpressionNode,
   CallExpressionNode,
   MemberExpressionNode,
+  JSCallExpressionNode,
+  JSSetExpressionNode,
   AccessModifier
 } from '../ast/nodes';
 
@@ -54,6 +56,14 @@ export class JavaScriptGenerator {
     output.push('// Generated JavaScript from Web# source');
     output.push('// Web# - Browser-native C#-like language');
     output.push('');
+
+    // Check if JS interop is used
+    const usesJSInterop = this.detectJSInterop(ast);
+    
+    // Generate JS runtime if needed
+    if (usesJSInterop) {
+      output.push(this.generateJSRuntime());
+    }
 
     // Generate Console.WriteLine polyfill
     output.push(this.generateConsolePolyfill());
@@ -330,6 +340,14 @@ const Console = {
           : `.${this.generateExpression(member.property)}`;
         return `${object}${property}`;
         
+      case 'JSCallExpression':
+        const jsCall = expression as JSCallExpressionNode;
+        return this.generateJSCallExpression(jsCall);
+        
+      case 'JSSetExpression':
+        const jsSet = expression as JSSetExpressionNode;
+        return this.generateJSSetExpression(jsSet);
+        
       default:
         return `/* TODO: Expression type ${expression.type} */`;
     }
@@ -383,5 +401,111 @@ const Console = {
   private indent(text: string): string {
     const indentation = ' '.repeat(this.indentLevel * this.options.indentSize);
     return indentation + text;
+  }
+
+  private generateJSCallExpression(jsCall: JSCallExpressionNode): string {
+    const args = jsCall.args.map(arg => this.generateExpression(arg)).join(', ');
+    const allArgs = args ? `"${jsCall.methodPath}", ${args}` : `"${jsCall.methodPath}"`;
+    return `JS.Call(${allArgs})`;
+  }
+
+  private generateJSSetExpression(jsSet: JSSetExpressionNode): string {
+    const object = this.generateExpression(jsSet.object);
+    const property = this.generateExpression(jsSet.property);
+    const value = this.generateExpression(jsSet.value);
+    return `JS.Set(${object}, ${property}, ${value})`;
+  }
+
+  private generateJSRuntime(): string {
+    return `// JavaScript Interop Runtime
+const JS = {
+  Call: function(path, ...args) {
+    const parts = path.split('.');
+    let obj = window;
+    for (let i = 0; i < parts.length - 1; i++) {
+      obj = obj[parts[i]];
+    }
+    const method = parts[parts.length - 1];
+    return obj[method](...args);
+  },
+  
+  Set: function(obj, prop, value) {
+    obj[prop] = value;
+  }
+};
+
+`;
+  }
+
+  private detectJSInterop(ast: CompilationUnitNode): boolean {
+    // Recursively check all expressions in the AST for JS interop usage
+    for (const classNode of ast.classes) {
+      if (this.detectJSInteropInClass(classNode)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private detectJSInteropInClass(classNode: ClassNode): boolean {
+    for (const member of classNode.members) {
+      if (member.type === 'Method') {
+        const method = member as MethodNode;
+        if (method.body && this.detectJSInteropInStatement(method.body)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  private detectJSInteropInStatement(statement: StatementNode): boolean {
+    switch (statement.type) {
+      case 'BlockStatement':
+        const block = statement as BlockStatementNode;
+        return block.statements.some(stmt => this.detectJSInteropInStatement(stmt));
+      
+      case 'ExpressionStatement':
+        const exprStmt = statement as ExpressionStatementNode;
+        return this.detectJSInteropInExpression(exprStmt.expression);
+      
+      case 'VariableDeclaration':
+        const varDecl = statement as VariableDeclarationNode;
+        return varDecl.initializer ? this.detectJSInteropInExpression(varDecl.initializer) : false;
+      
+      case 'ReturnStatement':
+        const returnStmt = statement as ReturnStatementNode;
+        return returnStmt.argument ? this.detectJSInteropInExpression(returnStmt.argument) : false;
+      
+      default:
+        return false;
+    }
+  }
+
+  private detectJSInteropInExpression(expression: ExpressionNode): boolean {
+    switch (expression.type) {
+      case 'JSCallExpression':
+      case 'JSSetExpression':
+        return true;
+      
+      case 'BinaryExpression':
+        const binary = expression as BinaryExpressionNode;
+        return this.detectJSInteropInExpression(binary.left) || this.detectJSInteropInExpression(binary.right);
+      
+      case 'AssignmentExpression':
+        const assignment = expression as AssignmentExpressionNode;
+        return this.detectJSInteropInExpression(assignment.left) || this.detectJSInteropInExpression(assignment.right);
+      
+      case 'CallExpression':
+        const call = expression as CallExpressionNode;
+        return this.detectJSInteropInExpression(call.callee) || call.args.some(arg => this.detectJSInteropInExpression(arg));
+      
+      case 'MemberExpression':
+        const member = expression as MemberExpressionNode;
+        return this.detectJSInteropInExpression(member.object) || this.detectJSInteropInExpression(member.property);
+      
+      default:
+        return false;
+    }
   }
 }

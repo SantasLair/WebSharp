@@ -44,6 +44,9 @@ export enum TokenType {
   ASYNC = 'ASYNC',
   AWAIT = 'AWAIT',
   TASK = 'TASK',
+  
+  // JavaScript Interop
+  JS = 'JS',
 
   // Types
   INT = 'INT',
@@ -153,6 +156,9 @@ export const KEYWORDS: Record<string, TokenType> = {
   'async': TokenType.ASYNC,
   'await': TokenType.AWAIT,
   'Task': TokenType.TASK,
+  
+  // JavaScript Interop
+  'JS': TokenType.JS,
   
   // Types
   'int': TokenType.INT,

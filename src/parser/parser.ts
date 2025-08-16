@@ -25,6 +25,8 @@ import {
   AssignmentExpressionNode,
   CallExpressionNode,
   MemberExpressionNode,
+  JSCallExpressionNode,
+  JSSetExpressionNode,
   AccessModifier,
   SourceLocation,
   Position
@@ -693,6 +695,25 @@ export class Parser {
   }
 
   private parsePrimary(): ExpressionNode {
+    // Handle JS interop
+    if (this.match(TokenType.JS)) {
+      this.consume(TokenType.DOT, 'Expected "." after "JS"');
+      
+      if (this.match(TokenType.IDENTIFIER)) {
+        const methodName = this.previous().value;
+        
+        if (methodName === 'Call') {
+          return this.parseJSCall();
+        } else if (methodName === 'Set') {
+          return this.parseJSSet();
+        } else {
+          throw new ParseError(`Unknown JS method: ${methodName}`, this.previous());
+        }
+      } else {
+        throw new ParseError('Expected method name after "JS."', this.peek());
+      }
+    }
+    
     if (this.match(TokenType.BOOLEAN)) {
       const value = this.previous().value === 'true';
       return new LiteralNode(value, 'boolean');
@@ -737,5 +758,44 @@ export class Parser {
            this.check(TokenType.VOID) ||
            (this.check(TokenType.IDENTIFIER) && 
             ['int', 'double', 'string', 'bool', 'object', 'dynamic', 'void'].includes(this.peek().value));
+  }
+
+  private parseJSCall(): JSCallExpressionNode {
+    this.consume(TokenType.LEFT_PAREN, 'Expected "(" after "JS.Call"');
+    
+    // First argument should be the method path string
+    const methodPathExpr = this.parseExpression();
+    if (!(methodPathExpr instanceof LiteralNode) || methodPathExpr.literalType !== 'string') {
+      throw new ParseError('JS.Call first argument must be a string literal', this.peek());
+    }
+    
+    const methodPath = methodPathExpr.value as string;
+    const args: ExpressionNode[] = [];
+    
+    // Parse additional arguments
+    while (!this.check(TokenType.RIGHT_PAREN) && !this.isAtEnd()) {
+      this.consume(TokenType.COMMA, 'Expected "," between arguments');
+      args.push(this.parseExpression());
+    }
+    
+    this.consume(TokenType.RIGHT_PAREN, 'Expected ")" after arguments');
+    
+    return new JSCallExpressionNode(methodPath, args);
+  }
+
+  private parseJSSet(): JSSetExpressionNode {
+    this.consume(TokenType.LEFT_PAREN, 'Expected "(" after "JS.Set"');
+    
+    // Parse three arguments: object, property, value
+    const object = this.parseExpression();
+    this.consume(TokenType.COMMA, 'Expected "," after object argument');
+    
+    const property = this.parseExpression();
+    this.consume(TokenType.COMMA, 'Expected "," after property argument');
+    
+    const value = this.parseExpression();
+    this.consume(TokenType.RIGHT_PAREN, 'Expected ")" after value argument');
+    
+    return new JSSetExpressionNode(object, property, value);
   }
 }

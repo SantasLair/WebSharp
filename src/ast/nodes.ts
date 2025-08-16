@@ -429,3 +429,44 @@ export class CompilationUnitNode extends ASTNode {
     };
   }
 }
+
+// JavaScript Interop Expression Nodes
+export class JSCallExpressionNode extends ExpressionNode {
+  constructor(
+    public readonly methodPath: string,
+    public readonly args: ExpressionNode[],
+    location?: SourceLocation
+  ) {
+    super('JSCallExpression', location);
+  }
+
+  toJSON(): Record<string, any> {
+    return {
+      type: this.type,
+      methodPath: this.methodPath,
+      arguments: this.args.map(arg => arg.toJSON()),
+      location: this.location
+    };
+  }
+}
+
+export class JSSetExpressionNode extends ExpressionNode {
+  constructor(
+    public readonly object: ExpressionNode,
+    public readonly property: ExpressionNode,
+    public readonly value: ExpressionNode,
+    location?: SourceLocation
+  ) {
+    super('JSSetExpression', location);
+  }
+
+  toJSON(): Record<string, any> {
+    return {
+      type: this.type,
+      object: this.object.toJSON(),
+      property: this.property.toJSON(),
+      value: this.value.toJSON(),
+      location: this.location
+    };
+  }
+}
