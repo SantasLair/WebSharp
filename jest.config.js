@@ -8,8 +8,5 @@ export default {
     '^.+\\.ts$': ['ts-jest', { useESM: true }]
   },
   moduleFileExtensions: ['ts', 'js'],
-  extensionsToTreatAsEsm: ['.ts'],
-  moduleNameMapping: {
-    '^(\\.{1,2}/.*)\\.js$': '$1'
-  }
+  extensionsToTreatAsEsm: ['.ts']
 };
