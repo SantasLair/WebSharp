@@ -6,12 +6,15 @@ import { Lexer } from './lexer/lexer';
 import { Parser } from './parser/parser';
 import { CompilationUnitNode } from './ast/nodes';
 import { SemanticAnalyzer, AnalysisResult } from './semantic/analyzer';
+import { JavaScriptGenerator, CodeGenOptions } from './codegen/generator';
 
 export class WebSharpCompiler {
   private semanticAnalyzer: SemanticAnalyzer;
+  private codeGenerator: JavaScriptGenerator;
 
-  constructor() {
+  constructor(options: Partial<CodeGenOptions> = {}) {
     this.semanticAnalyzer = new SemanticAnalyzer();
+    this.codeGenerator = new JavaScriptGenerator(options);
   }
 
   public compile(source: string): CompilationUnitNode {
@@ -38,6 +41,19 @@ export class WebSharpCompiler {
     const ast = this.compile(source);
     return JSON.stringify(ast.toJSON(), null, 2);
   }
+
+  public compileToJavaScript(source: string): string {
+    const ast = this.compile(source);
+    return this.codeGenerator.generate(ast);
+  }
+
+  public compileWithAnalysis(source: string): { ast: CompilationUnitNode; analysis: AnalysisResult; javascript: string } {
+    const ast = this.compile(source);
+    const analysis = this.semanticAnalyzer.analyzeWithSource(ast, source);
+    const javascript = this.codeGenerator.generate(ast);
+    
+    return { ast, analysis, javascript };
+  }
 }
 
 // Export main classes for external use
@@ -46,6 +62,7 @@ export { Parser, ParseError } from './parser/parser';
 export { TokenType, Token } from './lexer/tokens';
 export * from './ast/nodes';
 export { SemanticAnalyzer, SemanticError, AnalysisResult } from './semantic/analyzer';
+export { JavaScriptGenerator, CodeGenOptions } from './codegen/generator';
 
 // Main function for CLI usage
 export async function main(): Promise<void> {

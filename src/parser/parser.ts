@@ -14,6 +14,17 @@ import {
   ParameterNode,
   TypeNode,
   BlockStatementNode,
+  ExpressionStatementNode,
+  VariableDeclarationNode,
+  ReturnStatementNode,
+  StatementNode,
+  ExpressionNode,
+  IdentifierNode,
+  LiteralNode,
+  BinaryExpressionNode,
+  AssignmentExpressionNode,
+  CallExpressionNode,
+  MemberExpressionNode,
   AccessModifier,
   SourceLocation,
   Position
@@ -249,9 +260,7 @@ export class Parser {
 
     let body: BlockStatementNode | null = null;
     if (this.match(TokenType.LEFT_BRACE)) {
-      // For now, just skip the method body
-      this.skipBlock();
-      body = new BlockStatementNode([]); // Empty body for now
+      body = this.parseBlockStatement();
     } else if (this.match(TokenType.SEMICOLON)) {
       // Abstract method or interface method
       body = null;
@@ -437,5 +446,250 @@ export class Parser {
         column: endToken.column + endToken.value.length
       }
     };
+  }
+
+  // Statement parsing methods
+  private parseBlockStatement(): BlockStatementNode {
+    const statements: StatementNode[] = [];
+    
+    while (!this.check(TokenType.RIGHT_BRACE) && !this.isAtEnd()) {
+      statements.push(this.parseStatement());
+    }
+    
+    this.consume(TokenType.RIGHT_BRACE, 'Expected "}"');
+    
+    return new BlockStatementNode(statements);
+  }
+
+  private parseStatement(): StatementNode {
+    if (this.check(TokenType.RETURN)) {
+      return this.parseReturnStatement();
+    }
+    
+    if (this.check(TokenType.LEFT_BRACE)) {
+      this.advance(); // consume '{'
+      return this.parseBlockStatement();
+    }
+
+    // Check for variable declaration or expression statement
+    const start = this.current;
+    
+    // Try to parse as variable declaration
+    if (this.isTypeToken() || this.check(TokenType.VAR)) {
+      return this.parseVariableDeclaration();
+    }
+    
+    // Otherwise parse as expression statement
+    return this.parseExpressionStatement();
+  }
+
+  private parseReturnStatement(): ReturnStatementNode {
+    this.consume(TokenType.RETURN, 'Expected "return"');
+    
+    let argument: ExpressionNode | undefined;
+    if (!this.check(TokenType.SEMICOLON)) {
+      argument = this.parseExpression();
+    }
+    
+    this.consume(TokenType.SEMICOLON, 'Expected ";"');
+    
+    return new ReturnStatementNode(argument);
+  }
+
+  private parseVariableDeclaration(): VariableDeclarationNode {
+    let declarationType: TypeNode;
+    
+    if (this.match(TokenType.VAR)) {
+      // Type inference - create a placeholder type
+      declarationType = new TypeNode('var', false, []);
+    } else {
+      declarationType = this.parseType();
+    }
+    
+    const name = this.consume(TokenType.IDENTIFIER, 'Expected variable name').value;
+    
+    let initializer: ExpressionNode | undefined;
+    if (this.match(TokenType.ASSIGN)) {
+      initializer = this.parseExpression();
+    }
+    
+    this.consume(TokenType.SEMICOLON, 'Expected ";"');
+    
+    return new VariableDeclarationNode(declarationType, name, initializer);
+  }
+
+  private parseExpressionStatement(): ExpressionStatementNode {
+    const expression = this.parseExpression();
+    this.consume(TokenType.SEMICOLON, 'Expected ";"');
+    return new ExpressionStatementNode(expression);
+  }
+
+  // Expression parsing methods
+  private parseExpression(): ExpressionNode {
+    return this.parseAssignment();
+  }
+
+  private parseAssignment(): ExpressionNode {
+    const expr = this.parseLogicalOr();
+    
+    if (this.match(TokenType.ASSIGN)) {
+      const right = this.parseAssignment();
+      return new AssignmentExpressionNode(expr, right);
+    }
+    
+    return expr;
+  }
+
+  private parseLogicalOr(): ExpressionNode {
+    let expr = this.parseLogicalAnd();
+    
+    while (this.match(TokenType.OR)) {
+      const operator = this.previous().value;
+      const right = this.parseLogicalAnd();
+      expr = new BinaryExpressionNode(expr, operator, right);
+    }
+    
+    return expr;
+  }
+
+  private parseLogicalAnd(): ExpressionNode {
+    let expr = this.parseEquality();
+    
+    while (this.match(TokenType.AND)) {
+      const operator = this.previous().value;
+      const right = this.parseEquality();
+      expr = new BinaryExpressionNode(expr, operator, right);
+    }
+    
+    return expr;
+  }
+
+  private parseEquality(): ExpressionNode {
+    let expr = this.parseComparison();
+    
+    while (this.match(TokenType.EQUAL, TokenType.NOT_EQUAL)) {
+      const operator = this.previous().value;
+      const right = this.parseComparison();
+      expr = new BinaryExpressionNode(expr, operator, right);
+    }
+    
+    return expr;
+  }
+
+  private parseComparison(): ExpressionNode {
+    let expr = this.parseAddition();
+    
+    while (this.match(TokenType.GREATER_THAN, TokenType.GREATER_EQUAL, TokenType.LESS_THAN, TokenType.LESS_EQUAL)) {
+      const operator = this.previous().value;
+      const right = this.parseAddition();
+      expr = new BinaryExpressionNode(expr, operator, right);
+    }
+    
+    return expr;
+  }
+
+  private parseAddition(): ExpressionNode {
+    let expr = this.parseMultiplication();
+    
+    while (this.match(TokenType.PLUS, TokenType.MINUS)) {
+      const operator = this.previous().value;
+      const right = this.parseMultiplication();
+      expr = new BinaryExpressionNode(expr, operator, right);
+    }
+    
+    return expr;
+  }
+
+  private parseMultiplication(): ExpressionNode {
+    let expr = this.parseUnary();
+    
+    while (this.match(TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.MODULO)) {
+      const operator = this.previous().value;
+      const right = this.parseUnary();
+      expr = new BinaryExpressionNode(expr, operator, right);
+    }
+    
+    return expr;
+  }
+
+  private parseUnary(): ExpressionNode {
+    if (this.match(TokenType.NOT, TokenType.MINUS)) {
+      const operator = this.previous().value;
+      const right = this.parseUnary();
+      return new BinaryExpressionNode(new LiteralNode(null, 'null'), operator, right); // Simplified unary
+    }
+    
+    return this.parseCall();
+  }
+
+  private parseCall(): ExpressionNode {
+    let expr = this.parsePrimary();
+    
+    while (true) {
+      if (this.match(TokenType.LEFT_PAREN)) {
+        expr = this.finishCall(expr);
+      } else if (this.match(TokenType.DOT)) {
+        const name = this.consume(TokenType.IDENTIFIER, 'Expected property name').value;
+        expr = new MemberExpressionNode(expr, new IdentifierNode(name), false);
+      } else {
+        break;
+      }
+    }
+    
+    return expr;
+  }
+
+  private finishCall(callee: ExpressionNode): CallExpressionNode {
+    const args: ExpressionNode[] = [];
+    
+    if (!this.check(TokenType.RIGHT_PAREN)) {
+      do {
+        args.push(this.parseExpression());
+      } while (this.match(TokenType.COMMA));
+    }
+    
+    this.consume(TokenType.RIGHT_PAREN, 'Expected ")"');
+    
+    return new CallExpressionNode(callee, args);
+  }
+
+  private parsePrimary(): ExpressionNode {
+    if (this.check(TokenType.BOOLEAN)) {
+      const value = this.advance().value === 'true';
+      return new LiteralNode(value, 'boolean');
+    }
+    
+    if (this.match(TokenType.NULL)) {
+      return new LiteralNode(null, 'null');
+    }
+    
+    if (this.check(TokenType.NUMBER)) {
+      const value = parseFloat(this.advance().value);
+      return new LiteralNode(value, 'number');
+    }
+    
+    if (this.check(TokenType.STRING)) {
+      const value = this.advance().value;
+      // The lexer already removes quotes, so use the value directly
+      return new LiteralNode(value, 'string');
+    }
+    
+    if (this.check(TokenType.IDENTIFIER)) {
+      const name = this.advance().value;
+      return new IdentifierNode(name);
+    }
+    
+    if (this.match(TokenType.LEFT_PAREN)) {
+      const expr = this.parseExpression();
+      this.consume(TokenType.RIGHT_PAREN, 'Expected ")"');
+      return expr;
+    }
+    
+    throw new ParseError('Expected expression', this.peek());
+  }
+
+  private isTypeToken(): boolean {
+    return this.check(TokenType.IDENTIFIER) && 
+           ['int', 'double', 'string', 'bool', 'object', 'dynamic'].includes(this.peek().value);
   }
 }
